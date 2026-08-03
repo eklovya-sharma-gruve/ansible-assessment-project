@@ -1,0 +1,136 @@
+---
+# Gruve AAP LLD extractor — orchestration.
+# Collects low-level design facts from the platform (read-only) and renders
+# a machine-readable JSON bundle plus human-readable Markdown and HTML reports
+# that drop straight into the technical assessment report.
+
+- name: Validate inputs
+  ansible.builtin.assert:
+    that:
+      - aap_hostname | length > 0
+      - aap_token | length > 0
+    fail_msg: >-
+      aap_hostname and aap_token are required. On the controller, CONTROLLER_HOST
+      is auto-injected; supply a read-only OAuth token via the 'aap_token' survey var.
+    quiet: true
+
+- name: Initialise error accumulator
+  ansible.builtin.set_fact:
+    lld_collection_errors: []
+
+- name: Ensure output directory
+  ansible.builtin.file:
+    path: "{{ lld_output_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Collect infrastructure LLD
+  ansible.builtin.include_tasks: infrastructure.yml
+  when: collect_infrastructure | bool
+
+- name: Collect RBAC LLD
+  ansible.builtin.include_tasks: rbac.yml
+  when: collect_rbac | bool
+
+- name: Collect content LLD
+  ansible.builtin.include_tasks: content.yml
+  when: collect_content | bool
+
+- name: Collect automation LLD
+  ansible.builtin.include_tasks: automation.yml
+  when: collect_automation | bool
+
+- name: Collect event-driven LLD
+  ansible.builtin.include_tasks: event_driven.yml
+  when: collect_event_driven | bool
+
+- name: Collect licensing LLD
+  ansible.builtin.include_tasks: licensing.yml
+  when: collect_licensing | bool
+
+# ---- Enhanced collectors (v2) ----
+- name: Collect deeper RBAC LLD
+  ansible.builtin.include_tasks: rbac_depth.yml
+  when: collect_rbac_depth | bool and collect_rbac | bool
+
+- name: Collect job analytics LLD
+  ansible.builtin.include_tasks: job_analytics.yml
+  when: collect_job_analytics | bool
+
+- name: Inspect Git/SCM content (opt-in)
+  ansible.builtin.include_tasks: git_inspection.yml
+  when: collect_git_inspection | bool and collect_content | bool
+
+- name: Merge SA survey (pillars 7 & 8 + ROI)
+  ansible.builtin.include_tasks: survey_merge.yml
+  when: merge_survey | bool
+
+- name: Derive maturity scores
+  ansible.builtin.include_tasks: scoring.yml
+  when: compute_scoring | bool
+
+- name: Assemble the full LLD bundle
+  ansible.builtin.set_fact:
+    lld_bundle:
+      meta:
+        customer: "{{ lld_customer_name }}"
+        generated_utc: "{{ ansible_date_time.iso8601 | default('n/a') }}"
+        aap_api_flavour: "{{ aap_api_flavour }}"
+        source_host: "{{ aap_hostname }}"
+        collection_errors: "{{ lld_collection_errors | default([]) }}"
+        git_inspection_enabled: "{{ collect_git_inspection | bool }}"
+        survey_source: "{{ survey_file if (survey_file | length > 0) else 'defaults' }}"
+      maturity_index: "{{ lld_maturity_index | default('n/a') }}"
+      scores: "{{ lld_scores | default({}) }}"
+      infrastructure: "{{ lld_infrastructure | default({}) }}"
+      rbac: "{{ lld_rbac | default({}) }}"
+      rbac_depth: "{{ lld_rbac_depth | default({}) }}"
+      content: "{{ lld_content | default({}) }}"
+      automation: "{{ lld_automation | default({}) }}"
+      job_analytics: "{{ lld_job_analytics | default({}) }}"
+      event_driven: "{{ lld_event_driven | default({}) }}"
+      licensing: "{{ lld_licensing | default({}) }}"
+      git: "{{ lld_git | default({}) }}"
+      survey: "{{ lld_survey | default({}) }}"
+
+- name: Write LLD JSON bundle (machine-readable)
+  ansible.builtin.copy:
+    content: "{{ lld_bundle | to_nice_json }}"
+    dest: "{{ lld_output_dir }}/lld_bundle.json"
+    mode: "0644"
+
+- name: Render LLD Markdown report (paste into technical report)
+  ansible.builtin.template:
+    src: lld_report.md.j2
+    dest: "{{ lld_output_dir }}/lld_report.md"
+    mode: "0644"
+
+- name: Render LLD HTML report (branded, review copy)
+  ansible.builtin.template:
+    src: lld_report.html.j2
+    dest: "{{ lld_output_dir }}/lld_report.html"
+    mode: "0644"
+
+- name: Surface artifacts in the AAP job (set_stats)
+  ansible.builtin.set_stats:
+    data:
+      lld_json_path: "{{ lld_output_dir }}/lld_bundle.json"
+      lld_markdown_path: "{{ lld_output_dir }}/lld_report.md"
+      lld_html_path: "{{ lld_output_dir }}/lld_report.html"
+      lld_aap_version: "{{ lld_infrastructure.version | default('unknown') }}"
+      lld_instance_count: "{{ lld_infrastructure.instance_count | default(0) }}"
+      lld_managed_hosts: "{{ lld_content.total_managed_hosts | default(0) }}"
+      lld_maturity_index: "{{ lld_maturity_index | default('n/a') }}"
+      lld_collection_errors: "{{ lld_collection_errors | default([]) }}"
+
+- name: Print summary
+  ansible.builtin.debug:
+    msg:
+      - "AAP LLD extraction complete for {{ lld_customer_name }}"
+      - "Overall maturity index: {{ lld_maturity_index | default('n/a') }} / 5"
+      - "Version {{ lld_infrastructure.version | default('?') }} · {{ lld_infrastructure.instance_count | default(0) }} instance(s) · {{ lld_content.total_managed_hosts | default(0) }} managed hosts"
+      - "Job templates: {{ lld_automation.job_template_count | default(0) }} · Projects: {{ lld_content.project_count | default(0) }} · EDA activations: {{ lld_event_driven.activation_count | default(0) }}"
+      - "Job success rate: {{ lld_job_analytics.success_rate_pct | default('n/a') }}% (of {{ lld_job_analytics.jobs_analysed | default(0) }} analysed)"
+      - "Git inspection: {{ 'on' if collect_git_inspection | bool else 'off' }}{{ ' — ' ~ (lld_git.totals.secret_hits | default(0)) ~ ' potential secret(s)' if collect_git_inspection | bool else '' }}"
+      - "Outputs in {{ lld_output_dir }}: lld_bundle.json, lld_report.md, lld_report.html"
+      - "Collection errors: {{ lld_collection_errors | default([]) | length }}"

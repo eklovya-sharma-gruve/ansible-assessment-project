@@ -1,0 +1,30 @@
+---
+# Projects, inventories, inventory sources, private hub content — content LLD.
+- name: Collect projects
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/projects/", fetch_fact: lld_projects }
+
+- name: Collect inventories
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/inventories/", fetch_fact: lld_inventories }
+
+- name: Collect inventory sources
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/inventory_sources/", fetch_fact: lld_inv_sources }
+
+- name: Collect private hub collections
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.galaxy }}/repo/published/", fetch_fact: lld_hub_collections }
+
+- name: Distil content LLD
+  ansible.builtin.set_fact:
+    lld_content:
+      project_count: "{{ lld_projects | length }}"
+      projects: "{{ lld_projects | map('gruve_pick', ['name','scm_type','scm_url','scm_branch','scm_refspec','status','scm_update_on_launch']) | list }}"
+      git_project_count: "{{ lld_projects | selectattr('scm_type','defined') | selectattr('scm_type','equalto','git') | list | length }}"
+      manual_project_count: "{{ lld_projects | selectattr('scm_type','defined') | selectattr('scm_type','equalto','') | list | length }}"
+      inventory_count: "{{ lld_inventories | length }}"
+      inventories: "{{ lld_inventories | map('gruve_pick', ['name','kind','total_hosts','total_groups','has_inventory_sources']) | list }}"
+      inventory_source_types: "{{ lld_inv_sources | map(attribute='source', default='unknown') | list }}"
+      total_managed_hosts: "{{ lld_inventories | map(attribute='total_hosts', default=0) | map('int') | sum }}"
+      private_hub_collection_count: "{{ lld_hub_collections | length }}"

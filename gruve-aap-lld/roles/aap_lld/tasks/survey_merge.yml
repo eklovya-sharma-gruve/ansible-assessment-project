@@ -1,0 +1,22 @@
+---
+# Merge the SA survey (pillars 7 & 8 + interview signals + ROI inputs) into
+# the fact space so the report and scoring can consume it. If no survey_file
+# is provided, falls back to the bundled example defaults (all-neutral).
+
+- name: Load survey from file
+  ansible.builtin.include_vars:
+    file: "{{ survey_file }}"
+    name: lld_survey
+  when: survey_file | length > 0
+  failed_when: false
+
+- name: Load survey defaults if no file provided
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/templates/survey.example.yml"
+    name: lld_survey
+  when: survey_file | length == 0
+  failed_when: false
+
+- name: Ensure survey fact exists
+  ansible.builtin.set_fact:
+    lld_survey: "{{ lld_survey | default({}) }}"

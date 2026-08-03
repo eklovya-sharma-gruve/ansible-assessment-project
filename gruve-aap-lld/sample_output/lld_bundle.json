@@ -1,0 +1,543 @@
+{
+    "automation": {
+        "job_template_count": 5,
+        "job_templates": [
+            {
+                "ask_variables_on_launch": false,
+                "forks": 20,
+                "job_type": "run",
+                "name": "RHEL Patch - Prod",
+                "playbook": "patch.yml",
+                "survey_enabled": true,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 10,
+                "job_type": "run",
+                "name": "Provision VM (vSphere)",
+                "playbook": "provision.yml",
+                "survey_enabled": true,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 25,
+                "job_type": "run",
+                "name": "Network Backup",
+                "playbook": "net_backup.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 5,
+                "job_type": "run",
+                "name": "App Deploy (CI-triggered)",
+                "playbook": "deploy.yml",
+                "survey_enabled": false,
+                "verbosity": 1,
+                "webhook_service": "github"
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 15,
+                "job_type": "run",
+                "name": "CIS Hardening",
+                "playbook": "cis.yml",
+                "survey_enabled": true,
+                "verbosity": 0,
+                "webhook_service": ""
+            }
+        ],
+        "notification_types": [
+            "slack",
+            "webhook"
+        ],
+        "recent_launch_types": {
+            "manual": 120,
+            "scheduled": 55,
+            "webhook": 10,
+            "workflow": 15
+        },
+        "schedule_count": 2,
+        "schedules": [
+            {
+                "enabled": true,
+                "name": "Nightly patch window",
+                "rrule": "DTSTART:20250101T020000Z RRULE:FREQ=DAILY;INTERVAL=1"
+            },
+            {
+                "enabled": true,
+                "name": "Weekly network backup",
+                "rrule": "DTSTART:20250105T030000Z RRULE:FREQ=WEEKLY;BYDAY=SU"
+            }
+        ],
+        "webhook_enabled_templates": 1,
+        "workflow_count": 1,
+        "workflows": [
+            {
+                "name": "Full Stack Provision",
+                "survey_enabled": true
+            }
+        ]
+    },
+    "content": {
+        "git_project_count": 3,
+        "inventories": [
+            {
+                "has_inventory_sources": true,
+                "kind": "",
+                "name": "Production",
+                "total_groups": 24,
+                "total_hosts": 612
+            },
+            {
+                "has_inventory_sources": true,
+                "kind": "",
+                "name": "Non-Prod",
+                "total_groups": 12,
+                "total_hosts": 228
+            },
+            {
+                "has_inventory_sources": false,
+                "kind": "smart",
+                "name": "Network Devices (smart)",
+                "total_groups": 0,
+                "total_hosts": 140
+            }
+        ],
+        "inventory_count": 3,
+        "inventory_source_types": [
+            "vmware",
+            "ec2"
+        ],
+        "manual_project_count": 1,
+        "private_hub_collection_count": 2,
+        "project_count": 4,
+        "projects": [
+            {
+                "name": "infra-playbooks",
+                "scm_branch": "main",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": true,
+                "scm_url": "https://git.example.com/infra/playbooks.git",
+                "status": "successful"
+            },
+            {
+                "name": "network-automation",
+                "scm_branch": "main",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": true,
+                "scm_url": "https://git.example.com/net/automation.git",
+                "status": "successful"
+            },
+            {
+                "name": "security-baselines",
+                "scm_branch": "prod",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": false,
+                "scm_url": "https://git.example.com/sec/baselines.git",
+                "status": "successful"
+            },
+            {
+                "name": "legacy-scripts",
+                "scm_branch": "",
+                "scm_refspec": "",
+                "scm_type": "",
+                "scm_update_on_launch": false,
+                "scm_url": "",
+                "status": "successful"
+            }
+        ],
+        "total_managed_hosts": 980
+    },
+    "event_driven": {
+        "activation_count": 0,
+        "activations": [],
+        "decision_environment_count": 0,
+        "eda_in_use": false,
+        "eda_reachable": true,
+        "project_count": 0,
+        "rulebook_count": 0,
+        "running_count": 0
+    },
+    "git": {},
+    "infrastructure": {
+        "execution_environments": [
+            {
+                "image": "registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest",
+                "name": "Default execution environment",
+                "pull": "missing"
+            },
+            {
+                "image": "quay.io/gruve/ee-network:1.4",
+                "name": "Gruve custom EE (network)",
+                "pull": "always"
+            }
+        ],
+        "ha": true,
+        "has_mesh": true,
+        "instance_count": 4,
+        "instance_groups": [
+            {
+                "is_container_group": false,
+                "max_concurrent_jobs": 0,
+                "max_forks": 0,
+                "name": "controlplane",
+                "policy_instance_minimum": 2,
+                "policy_instance_percentage": 100
+            },
+            {
+                "is_container_group": false,
+                "max_concurrent_jobs": 0,
+                "max_forks": 0,
+                "name": "default",
+                "policy_instance_minimum": 1,
+                "policy_instance_percentage": 100
+            },
+            {
+                "is_container_group": true,
+                "max_concurrent_jobs": 50,
+                "max_forks": 200,
+                "name": "ocp-ee",
+                "policy_instance_minimum": 0,
+                "policy_instance_percentage": 0
+            }
+        ],
+        "instances": [
+            {
+                "capacity": 148,
+                "cpu": 8,
+                "enabled": true,
+                "hostname": "aap-ctrl-1",
+                "ip_address": "10.20.1.11",
+                "memory": "32.0 GB",
+                "node_state": "ready",
+                "node_type": "control"
+            },
+            {
+                "capacity": 148,
+                "cpu": 8,
+                "enabled": true,
+                "hostname": "aap-ctrl-2",
+                "ip_address": "10.20.1.12",
+                "memory": "32.0 GB",
+                "node_state": "ready",
+                "node_type": "control"
+            },
+            {
+                "capacity": 296,
+                "cpu": 16,
+                "enabled": true,
+                "hostname": "aap-exec-1",
+                "ip_address": "10.20.1.21",
+                "memory": "64.0 GB",
+                "node_state": "ready",
+                "node_type": "execution"
+            },
+            {
+                "capacity": 0,
+                "cpu": 4,
+                "enabled": true,
+                "hostname": "aap-hop-1",
+                "ip_address": "10.20.2.5",
+                "memory": "8.0 GB",
+                "node_state": "ready",
+                "node_type": "hop"
+            }
+        ],
+        "node_types": [
+            "control",
+            "control",
+            "execution",
+            "hop"
+        ],
+        "version": "4.6.7"
+    },
+    "job_analytics": {
+        "avg_elapsed_seconds": 152.4,
+        "failed_count": 20,
+        "failing_templates": {
+            "App Deploy (CI-triggered)": 6,
+            "Provision VM (vSphere)": 14
+        },
+        "failure_rate_pct": 10,
+        "jobs_analysed": 200,
+        "max_elapsed_seconds": 320.5,
+        "status_breakdown": {
+            "error": 6,
+            "failed": 14,
+            "successful": 180
+        },
+        "success_count": 180,
+        "success_rate_pct": 90,
+        "top_templates_by_runs": {
+            "App Deploy (CI-triggered)": 6,
+            "CIS Hardening": 30,
+            "Network Backup": 60,
+            "Provision VM (vSphere)": 14,
+            "RHEL Patch - Prod": 90
+        }
+    },
+    "licensing": {
+        "compliant": true,
+        "current_instances": 980,
+        "free_instances": 20,
+        "instance_count_entitled": 1000,
+        "license_type": "enterprise",
+        "subscription_name": "AAP - 1000 Managed Nodes",
+        "time_remaining_days": 100,
+        "utilization_pct": 98
+    },
+    "maturity_index": 2.89,
+    "meta": {
+        "aap_api_flavour": "gateway",
+        "collection_errors": [],
+        "customer": "Northwind",
+        "generated_utc": "2026-08-03T17:45:58Z",
+        "git_inspection_enabled": false,
+        "source_host": "http://127.0.0.1:8113",
+        "survey_source": "defaults"
+    },
+    "rbac": {
+        "auditor_count": 1,
+        "credential_count": 19,
+        "credential_type_summary": [
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "name": "Machine"
+                }
+            }
+        ],
+        "external_secret_backends": [
+            "HashiCorp Vault Secret Lookup"
+        ],
+        "org_count": 2,
+        "organizations": [
+            {
+                "description": "Default org",
+                "max_hosts": 0,
+                "name": "Default"
+            },
+            {
+                "description": "Infra automation",
+                "max_hosts": 2000,
+                "name": "Infrastructure"
+            }
+        ],
+        "superuser_count": 1,
+        "team_count": 3,
+        "teams": [
+            {
+                "name": "Platform",
+                "summary_fields": {
+                    "organization": {
+                        "name": "Infrastructure"
+                    }
+                }
+            },
+            {
+                "name": "NetOps",
+                "summary_fields": {
+                    "organization": {
+                        "name": "Infrastructure"
+                    }
+                }
+            },
+            {
+                "name": "SecOps",
+                "summary_fields": {
+                    "organization": {
+                        "name": "Infrastructure"
+                    }
+                }
+            }
+        ],
+        "user_count": 16
+    },
+    "rbac_depth": {
+        "access_entries_total": 15,
+        "admin_role_assignments": 4,
+        "execute_role_assignments": 1,
+        "role_count": 6,
+        "sampled_templates": 5,
+        "separation_of_duties_signal": true
+    },
+    "scores": {
+        "ai_readiness": {
+            "basis": "survey",
+            "score": 2
+        },
+        "cicd": {
+            "basis": "api",
+            "score": 3
+        },
+        "content": {
+            "basis": "api",
+            "score": 3
+        },
+        "coverage": {
+            "basis": "api",
+            "score": 1
+        },
+        "event_driven": {
+            "basis": "api",
+            "score": 1
+        },
+        "infrastructure": {
+            "basis": "api",
+            "score": 5
+        },
+        "licensing": {
+            "basis": "api",
+            "score": 5
+        },
+        "security": {
+            "basis": "api",
+            "score": 4
+        },
+        "skills": {
+            "basis": "survey",
+            "score": 2
+        }
+    },
+    "survey": {
+        "ai_readiness": {
+            "api_tool_surface_exposed": false,
+            "audit_reconstruction": "partial",
+            "context_systems": [],
+            "high_value_use_cases": [],
+            "leadership_stance": "cautious",
+            "notes": "",
+            "required_control_level": "full_hitl",
+            "score": 2
+        },
+        "interview": {
+            "auto_remediation_candidates": [],
+            "dr_failover_tested": false,
+            "expansion_appetite": "",
+            "itsm_platform": "",
+            "monitoring_tools": [],
+            "renewal_date": "",
+            "top_manual_tasks": []
+        },
+        "roi": {
+            "annual_compliance_exposure": 0,
+            "avg_cost_per_failed_change": 0,
+            "current_mttr_minutes": 0,
+            "engineer_cost_per_hour": 0,
+            "failed_change_windows_year": 0,
+            "hours_month_compliance_audit": 0,
+            "hours_month_patching_config": 0,
+            "hours_month_provisioning": 0,
+            "incidents_month_auto_remediable": 0
+        },
+        "skills": {
+            "change_process": "informal",
+            "coe_status": "aspirational",
+            "cultural_trust": "mixed",
+            "notes": "",
+            "onboarding": "ad_hoc",
+            "ownership_model": "siloed",
+            "score": 2,
+            "skill_distribution": "few_experts"
+        }
+    }
+}

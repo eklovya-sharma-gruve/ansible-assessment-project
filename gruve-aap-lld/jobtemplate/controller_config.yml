@@ -1,0 +1,20 @@
+---
+# Job-template-as-code for the infra.aap_configuration (or awx.awx) collection.
+# Apply with the redhat_cop / infra.aap_configuration playbooks, or use as a
+# reference for manual creation. Assumes a project pointing at this repo exists.
+
+controller_templates:
+  - name: "Gruve AAP LLD Extraction"
+    description: "Read-only LLD extraction for the assessment technical report."
+    job_type: run
+    organization: "Default"
+    inventory: "Demo Inventory"          # localhost inventory; any works (connection is local)
+    project: "Gruve AAP Assessment"       # project tracking this git repo
+    playbook: "playbooks/lld_extract.yml"
+    execution_environment: "Default execution environment"
+    ask_variables_on_launch: false
+    survey_enabled: true
+    survey_spec: "{{ lookup('file', 'jobtemplate/survey_spec.json') | from_json }}"
+    extra_vars:
+      # aap_hostname resolves from CONTROLLER_HOST automatically on the controller.
+      lld_output_dir: "{{ '{{' }} awx_isolated_data_dir | default('/tmp/gruve_lld') {{ '}}' }}"

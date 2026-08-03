@@ -1,0 +1,62 @@
+{
+  "name": "Gruve AAP LLD Extraction",
+  "description": "Read-only low-level design + maturity extraction for the assessment technical report.",
+  "spec": [
+    {
+      "question_name": "Read-only AAP token",
+      "question_description": "OAuth token from a read-only/auditor account (User > Tokens, scope: read).",
+      "variable": "aap_token",
+      "type": "password",
+      "required": true
+    },
+    {
+      "question_name": "Customer name",
+      "question_description": "Used in the report header.",
+      "variable": "lld_customer_name",
+      "type": "text",
+      "required": true,
+      "default": "[CUSTOMER NAME]"
+    },
+    {
+      "question_name": "API flavour",
+      "question_description": "gateway = AAP 2.5+, legacy = AAP 2.4",
+      "variable": "aap_api_flavour",
+      "type": "multiplechoice",
+      "choices": ["gateway", "legacy"],
+      "default": "gateway",
+      "required": true
+    },
+    {
+      "question_name": "Validate TLS certificates",
+      "variable": "aap_validate_certs",
+      "type": "multiplechoice",
+      "choices": ["true", "false"],
+      "default": "true",
+      "required": true
+    },
+    {
+      "question_name": "Enable Git content inspection",
+      "question_description": "OPT-IN. Clones project repos read-only to inspect content quality, CI, and scan for plaintext secrets. Requires SCM read access and the git binary in the EE.",
+      "variable": "collect_git_inspection",
+      "type": "multiplechoice",
+      "choices": ["false", "true"],
+      "default": "false",
+      "required": true
+    },
+    {
+      "question_name": "Git SCM read token (optional)",
+      "question_description": "Read-only deploy token for private repos. Leave blank for public/anonymous.",
+      "variable": "git_scm_token",
+      "type": "password",
+      "required": false
+    },
+    {
+      "question_name": "Survey file path (optional)",
+      "question_description": "Path to survey.yml with pillars 7 & 8 + ROI inputs. Blank = neutral defaults.",
+      "variable": "survey_file",
+      "type": "text",
+      "required": false,
+      "default": ""
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+---
+# Organizations, teams, users, credentials — the RBAC / access LLD.
+- name: Collect organizations
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/organizations/", fetch_fact: lld_orgs }
+
+- name: Collect teams
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/teams/", fetch_fact: lld_teams }
+
+- name: Collect users
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/users/", fetch_fact: lld_users }
+
+- name: Collect credential types
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/credential_types/", fetch_fact: lld_cred_types }
+
+- name: Collect credentials (metadata only)
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/credentials/", fetch_fact: lld_credentials }
+
+- name: Distil RBAC LLD
+  ansible.builtin.set_fact:
+    lld_rbac:
+      org_count: "{{ lld_orgs | length }}"
+      organizations: "{{ lld_orgs | map('gruve_pick', ['name','description','max_hosts']) | list }}"
+      team_count: "{{ lld_teams | length }}"
+      teams: "{{ lld_teams | map('gruve_pick', ['name','summary_fields']) | list }}"
+      user_count: "{{ lld_users | length }}"
+      superuser_count: "{{ lld_users | selectattr('is_superuser','defined') | selectattr('is_superuser') | list | length }}"
+      auditor_count: "{{ lld_users | selectattr('is_system_auditor','defined') | selectattr('is_system_auditor') | list | length }}"
+      credential_count: "{{ lld_credentials | length }}"
+      external_secret_backends: "{{ lld_cred_types | selectattr('kind','defined') | selectattr('kind','equalto','external') | map(attribute='name') | list }}"
+      credential_type_summary: "{{ lld_credentials | map(attribute='summary_fields', default={}) | map('gruve_pick', ['credential_type']) | list }}"

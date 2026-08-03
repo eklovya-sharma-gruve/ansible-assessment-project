@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  role_name: aap_lld
+  author: Gruve
+  description: Read-only extractor of Ansible Automation Platform low-level design (LLD) for assessment reports.
+  company: Gruve
+  license: proprietary
+  min_ansible_version: "2.14"
+  platforms: []
+  galaxy_tags: [ansible, aap, assessment, lld, redhat]
+dependencies: []

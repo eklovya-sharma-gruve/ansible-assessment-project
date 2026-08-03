@@ -1,0 +1,63 @@
+---
+# Git/SCM content inspection (OPT-IN: collect_git_inspection: true).
+# Clones project repos read-only and inspects content quality, secrets, and CI.
+# Requires the 'git' binary in the execution environment.
+
+- name: Check git availability
+  ansible.builtin.command: git --version
+  register: _git_check
+  changed_when: false
+  failed_when: false
+
+- name: Warn if git missing
+  ansible.builtin.set_fact:
+    lld_collection_errors: "{{ (lld_collection_errors | default([])) + ['git_inspection (git binary not found in EE)'] }}"
+  when: _git_check.rc != 0
+
+- name: Build inspector input (git-backed projects only)
+  ansible.builtin.set_fact:
+    _git_input:
+      workspace: "{{ git_workspace }}"
+      depth: "{{ git_clone_depth }}"
+      username: "{{ git_scm_username }}"
+      token: "{{ git_scm_token }}"
+      max_repos: "{{ git_max_repos }}"
+      secret_patterns: "{{ git_secret_patterns }}"
+      projects: >-
+        {{ (lld_projects | default([]))
+           | selectattr('scm_type','defined') | selectattr('scm_type','equalto','git')
+           | map('gruve_pick', ['name','scm_url']) | list }}
+  when: _git_check.rc == 0
+
+- name: Run Git inspector
+  ansible.builtin.command:
+    argv:
+      - python3
+      - "{{ role_path }}/files/git_inspect.py"
+  args:
+    stdin: "{{ _git_input | to_json }}"
+  register: _git_out
+  changed_when: false
+  failed_when: false
+  no_log: true
+  when: _git_check.rc == 0
+
+- name: Parse Git inspection result
+  ansible.builtin.set_fact:
+    lld_git: "{{ _git_out.stdout | from_json }}"
+  when:
+    - _git_check.rc == 0
+    - _git_out.stdout is defined
+    - _git_out.stdout | length > 0
+  failed_when: false
+
+- name: Record git inspection error
+  ansible.builtin.set_fact:
+    lld_collection_errors: "{{ (lld_collection_errors | default([])) + ['git_inspection (no parseable output)'] }}"
+  when:
+    - _git_check.rc == 0
+    - (lld_git is not defined) or (lld_git.totals is not defined)
+
+- name: Default empty git fact
+  ansible.builtin.set_fact:
+    lld_git: "{{ lld_git | default({'totals': {}, 'duplicated_roles': {}, 'repos': []}) }}"

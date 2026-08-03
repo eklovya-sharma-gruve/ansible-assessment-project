@@ -1,0 +1,41 @@
+---
+# Deeper RBAC LLD — beyond counts. Reveals who can execute against production,
+# separation-of-duties posture, and role assignment spread (Pillar 4).
+# Runs after rbac.yml; uses lld_jts collected in automation.yml if present.
+
+- name: Collect role definitions
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/roles/", fetch_fact: lld_roles }
+
+- name: Sample job templates for access-list inspection
+  ansible.builtin.set_fact:
+    _jt_sample: "{{ (lld_jts | default([]))[:15] }}"
+
+- name: Fetch access list per sampled job template
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ aap_prefix.controller }}/job_templates/{{ item.id }}/access_list/?page_size=100"
+    method: GET
+    headers: { Authorization: "Bearer {{ aap_token }}", Accept: "application/json" }
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+  register: _jt_access
+  no_log: true
+  failed_when: false
+  loop: "{{ _jt_sample }}"
+  loop_control:
+    label: "{{ item.name | default('jt') }}"
+  when: _jt_sample | length > 0 and (item.id is defined)
+
+- name: Distil RBAC depth LLD
+  ansible.builtin.set_fact:
+    lld_rbac_depth:
+      role_count: "{{ lld_roles | length }}"
+      admin_role_assignments: "{{ lld_roles | selectattr('name','defined') | selectattr('name','search','(?i)admin') | list | length }}"
+      execute_role_assignments: "{{ lld_roles | selectattr('name','defined') | selectattr('name','search','(?i)execute') | list | length }}"
+      # users/teams with access across the sampled prod-capable templates
+      sampled_templates: "{{ _jt_sample | length }}"
+      access_entries_total: >-
+        {{ (_jt_access.results | default([]))
+           | map(attribute='json', default={}) | map('gruve_get', 'count', 0) | map('int') | sum }}
+      # separation-of-duties signal: are there distinct admin vs execute roles at all?
+      separation_of_duties_signal: "{{ (lld_roles | selectattr('name','defined') | selectattr('name','search','(?i)execute') | list | length) > 0 }}"

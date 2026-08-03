@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>AAP Low-Level Design — {{ lld_customer_name }}</title>
+<style>
+  :root{--deep:#062D1F;--mint:#00E96C;--mid:#1B5C43;--green:#21A55E;--tint:#EDF5F0;--ink:#1A1A1A;--muted:#5A6B62}
+  *{box-sizing:border-box}
+  body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--ink);max-width:1040px;margin:32px auto;padding:0 20px;line-height:1.55}
+  .hero{background:var(--deep);color:#fff;border-radius:10px;padding:26px 30px}
+  .hero .eyebrow{color:var(--mint);font-weight:700;letter-spacing:1.5px;font-size:12px}
+  .hero h1{margin:6px 0 4px;font-size:28px}
+  .hero .sub{color:#CCEEDF;font-size:14px}
+  h2{color:var(--deep);border-bottom:3px solid var(--mint);padding-bottom:6px;margin-top:36px;font-size:20px}
+  h3{color:var(--mid);font-size:15px;margin:22px 0 8px}
+  table{border-collapse:collapse;width:100%;margin:10px 0 18px;font-size:13px}
+  th{background:var(--mid);color:#fff;text-align:left;padding:8px 10px;font-weight:600}
+  td{padding:7px 10px;border-bottom:1px solid #E0EAE4;vertical-align:top}
+  tr:nth-child(even) td{background:var(--tint)}
+  .kv td:first-child{font-weight:600;color:var(--deep);width:38%}
+  code{background:#F1F5F2;padding:1px 5px;border-radius:4px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .note{background:var(--tint);border-left:4px solid var(--mint);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--muted)}
+  .foot{color:var(--muted);font-size:12px;margin-top:30px;border-top:1px solid #E0EAE4;padding-top:10px}
+  .pill{display:inline-block;background:#DBF0E3;color:#1E7A46;border-radius:10px;padding:1px 9px;font-size:12px;font-weight:600}
+  .warn{background:#FBE4E1;color:#C0392B}
+</style></head><body>
+
+<div class="hero">
+  <div class="eyebrow">GRUVE · RED HAT ADVANCED PARTNER</div>
+  <h1>AAP Low-Level Design (LLD)</h1>
+  <div class="sub">{{ lld_customer_name }} · generated {{ ansible_date_time.iso8601 | default('n/a') }} UTC · API: {{ aap_api_flavour }}</div>
+</div>
+
+{% if lld_bundle.meta.collection_errors | length > 0 %}
+<p class="note"><b>Collection notes:</b> {{ lld_bundle.meta.collection_errors | join(', ') }}</p>
+{% endif %}
+<p class="note">Read-only extraction from the platform API. Use these tables to populate the technical assessment report's environment and current-state sections.</p>
+
+<h2>1 · Platform Infrastructure</h2>
+<table class="kv">
+  <tr><td>AAP / controller version</td><td>{{ lld_infrastructure.version | default('unknown') }}</td></tr>
+  <tr><td>Controller HA</td><td>{{ 'Yes' if lld_infrastructure.ha | default(false) else 'No' }}</td></tr>
+  <tr><td>Total instances</td><td>{{ lld_infrastructure.instance_count | default(0) }}</td></tr>
+  <tr><td>Automation mesh present</td><td>{{ 'Yes' if lld_infrastructure.has_mesh | default(false) else 'No' }}</td></tr>
+</table>
+
+<h3>1.1 Instances</h3>
+<table><tr><th>Hostname</th><th>Node type</th><th>State</th><th>Enabled</th><th>Capacity</th><th>CPU</th><th>Memory</th></tr>
+{% for i in lld_infrastructure.instances | default([]) %}
+<tr><td>{{ i.hostname | default('-') }}</td><td>{{ i.node_type | default('-') }}</td><td>{{ i.node_state | default('-') }}</td><td>{{ i.enabled | default('-') }}</td><td>{{ i.capacity | default('-') }}</td><td>{{ i.cpu | default('-') }}</td><td>{{ i.memory | default('-') }}</td></tr>
+{% endfor %}</table>
+
+<h3>1.2 Instance groups</h3>
+<table><tr><th>Name</th><th>Container</th><th>Min inst.</th><th>Inst. %</th><th>Max jobs</th><th>Max forks</th></tr>
+{% for g in lld_infrastructure.instance_groups | default([]) %}
+<tr><td>{{ g.name | default('-') }}</td><td>{{ g.is_container_group | default('-') }}</td><td>{{ g.policy_instance_minimum | default('-') }}</td><td>{{ g.policy_instance_percentage | default('-') }}</td><td>{{ g.max_concurrent_jobs | default('-') }}</td><td>{{ g.max_forks | default('-') }}</td></tr>
+{% endfor %}</table>
+
+<h3>1.3 Execution environments</h3>
+<table><tr><th>Name</th><th>Image</th><th>Pull</th></tr>
+{% for e in lld_infrastructure.execution_environments | default([]) %}
+<tr><td>{{ e.name | default('-') }}</td><td><code>{{ e.image | default('-') }}</code></td><td>{{ e.pull | default('-') }}</td></tr>
+{% endfor %}</table>
+
+<h2>2 · Access &amp; RBAC</h2>
+<table class="kv">
+  <tr><td>Organizations</td><td>{{ lld_rbac.org_count | default(0) }}</td></tr>
+  <tr><td>Teams</td><td>{{ lld_rbac.team_count | default(0) }}</td></tr>
+  <tr><td>Users (superusers / auditors)</td><td>{{ lld_rbac.user_count | default(0) }} ({{ lld_rbac.superuser_count | default(0) }} / {{ lld_rbac.auditor_count | default(0) }})</td></tr>
+  <tr><td>Credentials</td><td>{{ lld_rbac.credential_count | default(0) }}</td></tr>
+  <tr><td>External secret backends</td><td>{% if lld_rbac.external_secret_backends | default([]) | length > 0 %}<span class="pill">{{ lld_rbac.external_secret_backends | join(', ') }}</span>{% else %}<span class="pill warn">none detected</span>{% endif %}</td></tr>
+</table>
+<table><tr><th>Organization</th><th>Description</th><th>Max hosts</th></tr>
+{% for o in lld_rbac.organizations | default([]) %}
+<tr><td>{{ o.name | default('-') }}</td><td>{{ o.description | default('') }}</td><td>{{ o.max_hosts | default('-') }}</td></tr>
+{% endfor %}</table>
+
+<h2>3 · Content</h2>
+<table class="kv">
+  <tr><td>Projects (Git / manual)</td><td>{{ lld_content.project_count | default(0) }} ({{ lld_content.git_project_count | default(0) }} / {{ lld_content.manual_project_count | default(0) }})</td></tr>
+  <tr><td>Inventories</td><td>{{ lld_content.inventory_count | default(0) }}</td></tr>
+  <tr><td>Total managed hosts</td><td>{{ lld_content.total_managed_hosts | default(0) }}</td></tr>
+  <tr><td>Private hub collections</td><td>{{ lld_content.private_hub_collection_count | default(0) }}</td></tr>
+</table>
+<h3>3.1 Projects</h3>
+<table><tr><th>Name</th><th>SCM</th><th>URL</th><th>Branch</th><th>Status</th></tr>
+{% for p in lld_content.projects | default([]) %}
+<tr><td>{{ p.name | default('-') }}</td><td>{{ p.scm_type | default('manual') or 'manual' }}</td><td><code>{{ p.scm_url | default('-') or '-' }}</code></td><td>{{ p.scm_branch | default('-') or '-' }}</td><td>{{ p.status | default('-') }}</td></tr>
+{% endfor %}</table>
+<h3>3.2 Inventories</h3>
+<table><tr><th>Name</th><th>Kind</th><th>Hosts</th><th>Groups</th><th>Sources</th></tr>
+{% for inv in lld_content.inventories | default([]) %}
+<tr><td>{{ inv.name | default('-') }}</td><td>{{ inv.kind | default('static') or 'static' }}</td><td>{{ inv.total_hosts | default(0) }}</td><td>{{ inv.total_groups | default(0) }}</td><td>{{ inv.has_inventory_sources | default('-') }}</td></tr>
+{% endfor %}</table>
+
+<h2>4 · Automation Assets</h2>
+<table class="kv">
+  <tr><td>Job templates</td><td>{{ lld_automation.job_template_count | default(0) }}</td></tr>
+  <tr><td>Workflow templates</td><td>{{ lld_automation.workflow_count | default(0) }}</td></tr>
+  <tr><td>Schedules</td><td>{{ lld_automation.schedule_count | default(0) }}</td></tr>
+  <tr><td>Webhook-enabled templates</td><td>{{ lld_automation.webhook_enabled_templates | default(0) }}</td></tr>
+  <tr><td>Recent launch mix</td><td>{% for k,v in (lld_automation.recent_launch_types | default({})).items() %}{{ k }}={{ v }}{{ ", " if not loop.last }}{% endfor %}</td></tr>
+</table>
+<h3>4.1 Job templates</h3>
+<table><tr><th>Name</th><th>Type</th><th>Playbook</th><th>Forks</th><th>Webhook</th><th>Survey</th></tr>
+{% for jt in lld_automation.job_templates | default([]) %}
+<tr><td>{{ jt.name | default('-') }}</td><td>{{ jt.job_type | default('-') }}</td><td><code>{{ jt.playbook | default('-') }}</code></td><td>{{ jt.forks | default('-') }}</td><td>{{ jt.webhook_service | default('') or '-' }}</td><td>{{ jt.survey_enabled | default('-') }}</td></tr>
+{% endfor %}</table>
+<h3>4.2 Schedules</h3>
+<table><tr><th>Name</th><th>Enabled</th><th>Recurrence</th></tr>
+{% for s in lld_automation.schedules | default([]) %}
+<tr><td>{{ s.name | default('-') }}</td><td>{{ s.enabled | default('-') }}</td><td><code>{{ s.rrule | default('-') }}</code></td></tr>
+{% endfor %}</table>
+
+<h2>5 · Event-Driven Automation</h2>
+<table class="kv">
+  <tr><td>EDA reachable</td><td>{{ 'Yes' if lld_event_driven.eda_reachable | default(false) else 'No / not present' }}</td></tr>
+  <tr><td>Activations (running)</td><td>{{ lld_event_driven.activation_count | default(0) }} ({{ lld_event_driven.running_count | default(0) }})</td></tr>
+  <tr><td>Rulebooks</td><td>{{ lld_event_driven.rulebook_count | default(0) }}</td></tr>
+  <tr><td>Decision environments</td><td>{{ lld_event_driven.decision_environment_count | default(0) }}</td></tr>
+</table>
+{% if lld_event_driven.activations | default([]) | length > 0 %}
+<table><tr><th>Activation</th><th>Status</th><th>Restart policy</th></tr>
+{% for a in lld_event_driven.activations | default([]) %}
+<tr><td>{{ a.name | default('-') }}</td><td>{{ a.status | default('-') }}</td><td>{{ a.restart_policy | default('-') }}</td></tr>
+{% endfor %}</table>
+{% else %}
+<p class="note">No EDA activations detected — event-driven automation not yet adopted (Track 02 opportunity).</p>
+{% endif %}
+
+<h2>6 · Subscription &amp; Entitlement</h2>
+<table class="kv">
+  <tr><td>License / subscription</td><td>{{ lld_licensing.license_type | default('unknown') }} · {{ lld_licensing.subscription_name | default('unknown') }}</td></tr>
+  <tr><td>Entitled / consumed</td><td>{{ lld_licensing.instance_count_entitled | default('-') }} / {{ lld_licensing.current_instances | default('-') }}</td></tr>
+  <tr><td>Utilization</td><td>{{ lld_licensing.utilization_pct | default('-') }}%</td></tr>
+  <tr><td>Compliant</td><td>{% if lld_licensing.compliant | default(true) %}<span class="pill">Yes</span>{% else %}<span class="pill warn">No</span>{% endif %}</td></tr>
+  <tr><td>Days remaining</td><td>{{ lld_licensing.time_remaining_days | default('-') }}</td></tr>
+</table>
+
+<div class="foot">Generated by the Gruve AAP LLD Extractor · Gruve Confidential · read-only extraction from {{ aap_hostname }}.</div>
+</body></html>

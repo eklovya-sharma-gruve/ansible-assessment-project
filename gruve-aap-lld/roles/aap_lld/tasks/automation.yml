@@ -1,0 +1,41 @@
+---
+# Job templates, workflows, schedules, notifications, recent job stats.
+- name: Collect job templates
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/job_templates/", fetch_fact: lld_jts }
+
+- name: Collect workflow job templates
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/workflow_job_templates/", fetch_fact: lld_wfjts }
+
+- name: Collect schedules
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/schedules/", fetch_fact: lld_schedules }
+
+- name: Collect notification templates
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/notification_templates/", fetch_fact: lld_notifs }
+
+- name: Collect recent jobs (one page, for launch_type mix)
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ aap_prefix.controller }}/unified_jobs/?order_by=-finished&page_size=200"
+    method: GET
+    headers: { Authorization: "Bearer {{ aap_token }}", Accept: "application/json" }
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+  register: _ujobs
+  no_log: true
+  failed_when: false
+
+- name: Distil automation LLD
+  ansible.builtin.set_fact:
+    lld_automation:
+      job_template_count: "{{ lld_jts | length }}"
+      job_templates: "{{ lld_jts | map('gruve_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
+      workflow_count: "{{ lld_wfjts | length }}"
+      workflows: "{{ lld_wfjts | map('gruve_pick', ['name','survey_enabled']) | list }}"
+      schedule_count: "{{ lld_schedules | length }}"
+      schedules: "{{ lld_schedules | map('gruve_pick', ['name','rrule','enabled']) | list }}"
+      notification_types: "{{ lld_notifs | map(attribute='notification_type', default='unknown') | list }}"
+      webhook_enabled_templates: "{{ lld_jts | selectattr('webhook_service','defined') | rejectattr('webhook_service','equalto','') | list | length }}"
+      recent_launch_types: "{{ (_ujobs.json.results | default([]) if (_ujobs.json is defined) else []) | map(attribute='launch_type', default='unknown') | list | gruve_counter }}"

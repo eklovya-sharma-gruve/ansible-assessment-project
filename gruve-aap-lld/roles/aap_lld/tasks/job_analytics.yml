@@ -1,0 +1,40 @@
+---
+# Job analytics LLD — statistical signal from recent job runs.
+# Feeds Pillar 2 (coverage/toil), Pillar 6 (MTTR baseline), and ROI inputs.
+
+- name: Fetch recent jobs for analytics
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ aap_prefix.controller }}/jobs/?order_by=-finished&page_size={{ analytics_job_sample }}"
+    method: GET
+    headers: { Authorization: "Bearer {{ aap_token }}", Accept: "application/json" }
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+  register: _jobs_a
+  no_log: true
+  failed_when: false
+
+- name: Set jobs sample fact
+  ansible.builtin.set_fact:
+    _jobs: "{{ (_jobs_a.json.results | default([])) if (_jobs_a.json is defined) else [] }}"
+
+- name: Compute status breakdown
+  ansible.builtin.set_fact:
+    _status_counts: "{{ _jobs | map(attribute='status', default='unknown') | list | gruve_counter }}"
+    _elapsed_list: "{{ _jobs | map(attribute='elapsed', default=0) | map('float') | list }}"
+    _failed_jobs: "{{ _jobs | selectattr('status','defined') | selectattr('status','in',['failed','error']) | list }}"
+
+- name: Distil job analytics LLD
+  ansible.builtin.set_fact:
+    lld_job_analytics:
+      jobs_analysed: "{{ _jobs | length }}"
+      status_breakdown: "{{ _status_counts }}"
+      success_count: "{{ _status_counts.get('successful', 0) }}"
+      failed_count: "{{ (_status_counts.get('failed', 0) | int) + (_status_counts.get('error', 0) | int) }}"
+      success_rate_pct: "{{ (_status_counts.get('successful', 0)) | gruve_pct(_jobs | length) }}"
+      failure_rate_pct: "{{ ((_status_counts.get('failed', 0) | int) + (_status_counts.get('error', 0) | int)) | gruve_pct(_jobs | length) }}"
+      avg_elapsed_seconds: "{{ ((_elapsed_list | sum) / ([_jobs | length, 1] | max)) | round(1) }}"
+      max_elapsed_seconds: "{{ (_elapsed_list | max) if (_elapsed_list | length > 0) else 0 }}"
+      # per-template run frequency (top offenders = automation hot-spots)
+      top_templates_by_runs: "{{ _jobs | map(attribute='name', default='unknown') | list | gruve_counter }}"
+      # failure concentration helps target closed-loop remediation candidates
+      failing_templates: "{{ _failed_jobs | map(attribute='name', default='unknown') | list | gruve_counter }}"

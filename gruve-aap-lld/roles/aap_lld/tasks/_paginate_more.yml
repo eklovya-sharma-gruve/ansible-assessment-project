@@ -1,0 +1,28 @@
+---
+# Follow subsequent 'next' pages until exhausted or max pages hit.
+- name: "Fetch next page"
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ _next }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ aap_token }}"
+      Accept: "application/json"
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+    status_code: [200]
+  register: _resp
+  no_log: true
+  failed_when: false
+
+- name: "Aggregate next page"
+  ansible.builtin.set_fact:
+    _agg: "{{ _agg + (_resp.json.results | default([])) }}"
+    _next: "{{ (_resp.json.next | default('')) if (_resp.json.next is defined and _resp.json.next) else '' }}"
+    _pages: "{{ _pages | int + 1 }}"
+  when: _resp.status is defined and _resp.status == 200
+
+- name: "Recurse if more pages"
+  ansible.builtin.include_tasks: _paginate_more.yml
+  when:
+    - _next | length > 0
+    - _pages | int < lld_max_pages

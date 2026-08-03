@@ -1,0 +1,86 @@
+---
+# Derive 1-5 maturity scores per pillar from the collected evidence.
+# Each score carries a 'basis' (api / git / survey / mixed) so the report can
+# show which findings are machine-derived vs. SA judgement. Transparent, simple
+# thresholds — the SA can override any score in the report.
+
+- name: Score Pillar 1 — Infrastructure
+  ansible.builtin.set_fact:
+    _score_infra: >-
+      {{ 1
+         + (2 if (lld_infrastructure.ha | default(false)) else 0)
+         + (1 if ((lld_infrastructure.instance_count | default(0) | int) >= 2) else 0)
+         + (1 if (lld_infrastructure.has_mesh | default(false)) else 0)
+         + (1 if ((lld_infrastructure.execution_environments | default([]) | length) >= 2) else 0) }}
+
+- name: Score Pillar 2 — Coverage
+  ansible.builtin.set_fact:
+    _score_cov: >-
+      {{ 1
+         + (1 if ((lld_automation.job_template_count | default(0) | int) >= 10) else 0)
+         + (1 if ((lld_automation.job_template_count | default(0) | int) >= 30) else 0)
+         + (2 if (((lld_automation.recent_launch_types | default({})).get('scheduled', 0) | int)
+                  + ((lld_automation.recent_launch_types | default({})).get('webhook', 0) | int)
+                  + ((lld_automation.recent_launch_types | default({})).get('workflow', 0) | int)
+                  > ((lld_automation.recent_launch_types | default({})).get('manual', 0) | int)) else 0) }}
+
+- name: Score Pillar 3 — Content
+  ansible.builtin.set_fact:
+    _score_content: >-
+      {{ 1
+         + (1 if ((lld_content.git_project_count | default(0) | int) > (lld_content.manual_project_count | default(0) | int)) else 0)
+         + (1 if ((lld_content.private_hub_collection_count | default(0) | int) > 0) else 0)
+         + (1 if (collect_git_inspection | bool and (lld_git.totals.repos_with_roles | default(0) | int) > 0) else 0)
+         + (1 if (collect_git_inspection | bool and (lld_git.duplicated_role_count | default(99) | int) == 0) else 0) }}
+
+- name: Score Pillar 4 — Security
+  ansible.builtin.set_fact:
+    _score_sec: >-
+      {{ 1
+         + (1 if ((lld_rbac.external_secret_backends | default([]) | length) > 0) else 0)
+         + (1 if ((lld_rbac.org_count | default(0) | int) > 1 and (lld_rbac.team_count | default(0) | int) > 0) else 0)
+         + (1 if (collect_rbac_depth | bool and (lld_rbac_depth.separation_of_duties_signal | default(false))) else 0)
+         + (1 if (collect_git_inspection | bool and (lld_git.totals.secret_hits | default(1) | int) == 0) else 0) }}
+
+- name: Score Pillar 5 — CI/CD
+  ansible.builtin.set_fact:
+    _score_cicd: >-
+      {{ 1
+         + (1 if ((lld_content.git_project_count | default(0) | int) > 0) else 0)
+         + (1 if ((lld_automation.webhook_enabled_templates | default(0) | int) > 0) else 0)
+         + (2 if (collect_git_inspection | bool and (lld_git.totals.repos_with_lint | default(0) | int) > 0
+                  and (lld_git.totals.repos_with_ci | default(0) | int) > 0) else 0) }}
+
+- name: Score Pillar 6 — Event-Driven
+  ansible.builtin.set_fact:
+    _score_eda: >-
+      {{ 1
+         + (2 if (lld_event_driven.eda_in_use | default(false)) else 0)
+         + (1 if ((lld_event_driven.running_count | default(0) | int) > 0) else 0)
+         + (1 if ((lld_event_driven.rulebook_count | default(0) | int) >= 3) else 0) }}
+
+- name: Score Pillar 9 — Licensing
+  ansible.builtin.set_fact:
+    _score_lic: >-
+      {{ 1
+         + (1 if (lld_licensing.compliant | default(true)) else 0)
+         + (2 if ((lld_licensing.utilization_pct | default(0) | int) >= 60) else 0)
+         + (1 if ((lld_licensing.utilization_pct | default(0) | int) >= 40) else 0) }}
+
+- name: Clamp API/git-derived scores to 1..5 and attach basis
+  ansible.builtin.set_fact:
+    lld_scores:
+      infrastructure: { score: "{{ [[_score_infra | int, 5] | min, 1] | max }}", basis: "api" }
+      coverage:       { score: "{{ [[_score_cov | int, 5] | min, 1] | max }}", basis: "api" }
+      content:        { score: "{{ [[_score_content | int, 5] | min, 1] | max }}", basis: "{{ 'mixed' if collect_git_inspection | bool else 'api' }}" }
+      security:       { score: "{{ [[_score_sec | int, 5] | min, 1] | max }}", basis: "{{ 'mixed' if collect_git_inspection | bool else 'api' }}" }
+      cicd:           { score: "{{ [[_score_cicd | int, 5] | min, 1] | max }}", basis: "{{ 'mixed' if collect_git_inspection | bool else 'api' }}" }
+      event_driven:   { score: "{{ [[_score_eda | int, 5] | min, 1] | max }}", basis: "api" }
+      ai_readiness:   { score: "{{ [[lld_survey.ai_readiness.score | default(2) | int, 5] | min, 1] | max }}", basis: "survey" }
+      skills:         { score: "{{ [[lld_survey.skills.score | default(2) | int, 5] | min, 1] | max }}", basis: "survey" }
+      licensing:      { score: "{{ [[_score_lic | int, 5] | min, 1] | max }}", basis: "api" }
+
+- name: Compute overall maturity index
+  ansible.builtin.set_fact:
+    lld_maturity_index: >-
+      {{ ((lld_scores.values() | map(attribute='score') | map('int') | sum) / (lld_scores | length)) | round(2) }}

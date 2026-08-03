@@ -1,0 +1,68 @@
+---
+# Gruve AAP LLD extractor — role defaults.
+# Override via survey vars or extra-vars at job launch.
+
+# --- Connection ---
+# Base URL of the platform. On the controller itself, CONTROLLER_HOST is injected.
+aap_hostname: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') | default('', true) }}"
+# Read-only OAuth token (User > Tokens, scope: read). Provide via masked survey var.
+aap_token: ""
+aap_validate_certs: true
+
+# --- API flavour ---
+# 'gateway' => AAP 2.5+ (/api/controller/v2, /api/eda/v1, /api/galaxy)
+# 'legacy'  => AAP 2.4  (/api/v2, ...)
+aap_api_flavour: "gateway"
+
+_prefix_map:
+  gateway:
+    controller: "/api/controller/v2"
+    eda: "/api/eda/v1"
+    galaxy: "/api/galaxy/_ui/v1"
+    gateway: "/api/gateway/v1"
+  legacy:
+    controller: "/api/v2"
+    eda: "/api/eda/v1"
+    galaxy: "/api/galaxy/_ui/v1"
+    gateway: "/api/v2"
+
+aap_prefix: "{{ _prefix_map[aap_api_flavour] }}"
+
+# --- Collection scope (toggle sections off if an API is not reachable) ---
+collect_infrastructure: true
+collect_rbac: true
+collect_content: true
+collect_automation: true
+collect_event_driven: true
+collect_licensing: true
+
+# Enhanced collectors (added in v2)
+collect_rbac_depth: true          # job-template access lists + role assignments
+collect_job_analytics: true       # success/fail rates, MTTR proxy, run frequency
+collect_git_inspection: false     # OPT-IN: clones project repos in the EE (needs SCM read creds)
+merge_survey: true                # fold survey.yml (pillars 7 & 8 + ROI inputs) into the bundle
+compute_scoring: true             # derive 1-5 pillar scores from evidence
+
+# --- Job analytics window ---
+analytics_job_sample: 400         # how many recent unified_jobs to analyse
+
+# --- Git inspection (only used when collect_git_inspection: true) ---
+git_workspace: "/tmp/gruve_lld_repos"
+git_clone_depth: 1
+git_scm_username: ""               # optional; for private repos (use a read-only deploy token)
+git_scm_token: ""                  # optional; masked survey var
+git_max_repos: 25                  # safety cap
+git_secret_patterns:              # regexes that flag likely plaintext secrets
+  - "(?i)password\\s*[:=]\\s*['\"]?[^\\s'\"{}]{4,}"
+  - "(?i)(api[_-]?key|secret|token)\\s*[:=]\\s*['\"]?[^\\s'\"{}]{8,}"
+  - "-----BEGIN (RSA|OPENSSH|EC|DSA|PGP) PRIVATE KEY-----"
+  - "(?i)AKIA[0-9A-Z]{16}"        # AWS access key id
+
+# --- Survey input (pillars 7 & 8 + ROI baseline the API can't see) ---
+survey_file: ""                    # path to survey.yml; empty = use bundled template defaults
+
+# --- Output ---
+lld_output_dir: "{{ lookup('ansible.builtin.env', 'AWX_ISOLATED_DATA_DIR') | default('/tmp/gruve_lld', true) }}"
+lld_customer_name: "[CUSTOMER NAME]"
+lld_page_size: 200
+lld_max_pages: 25

@@ -1,0 +1,15 @@
+---
+# Gruve AAP Low-Level Design (LLD) Extractor
+# Runs on Ansible Automation Platform as a job template. Read-only: every call
+# is an HTTP GET against the platform's own API. Produces an LLD bundle (JSON)
+# plus Markdown and HTML reports to populate the technical assessment report.
+#
+# Required at launch (survey): aap_token (masked). On the controller,
+# CONTROLLER_HOST is auto-injected as aap_hostname.
+
+- name: Extract AAP Low-Level Design
+  hosts: localhost
+  connection: local
+  gather_facts: true          # for ansible_date_time in the report
+  roles:
+    - role: aap_lld

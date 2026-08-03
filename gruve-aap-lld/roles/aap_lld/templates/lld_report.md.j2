@@ -1,0 +1,299 @@
+{# Markdown LLD report — organized to map onto the technical report's
+   Environment Overview / current-state sections. #}
+# Ansible Automation Platform — Low-Level Design (LLD)
+
+**Customer:** {{ lld_customer_name }}
+**Generated:** {{ ansible_date_time.iso8601 | default('n/a') }} (UTC)
+**Source platform:** {{ aap_hostname }}  ·  **API flavour:** {{ aap_api_flavour }}
+{% if lld_bundle.meta.collection_errors | length > 0 %}
+**Collection notes:** {{ lld_bundle.meta.collection_errors | join(', ') }}
+{% endif %}
+
+> Read-only extraction. Paste the relevant sections into the technical assessment report's environment / current-state architecture.
+
+{% if lld_scores is defined and lld_scores | length > 0 %}
+---
+
+## 0. Automation Maturity Scorecard
+
+**Overall maturity index: {{ lld_maturity_index | default('n/a') }} / 5**
+
+| # | Pillar | Score | Basis |
+|---|---|---|---|
+| 1 | Infrastructure & Architecture | {{ lld_scores.infrastructure.score }} / 5 | {{ lld_scores.infrastructure.basis }} |
+| 2 | Automation Coverage | {{ lld_scores.coverage.score }} / 5 | {{ lld_scores.coverage.basis }} |
+| 3 | Content Management | {{ lld_scores.content.score }} / 5 | {{ lld_scores.content.basis }} |
+| 4 | Security & Compliance | {{ lld_scores.security.score }} / 5 | {{ lld_scores.security.basis }} |
+| 5 | CI/CD & GitOps Integration | {{ lld_scores.cicd.score }} / 5 | {{ lld_scores.cicd.basis }} |
+| 6 | Event-Driven Automation | {{ lld_scores.event_driven.score }} / 5 | {{ lld_scores.event_driven.basis }} |
+| 7 | AI / Reasoning Readiness | {{ lld_scores.ai_readiness.score }} / 5 | {{ lld_scores.ai_readiness.basis }} |
+| 8 | Skills & Governance | {{ lld_scores.skills.score }} / 5 | {{ lld_scores.skills.basis }} |
+| 9 | Licensing & Cost | {{ lld_scores.licensing.score }} / 5 | {{ lld_scores.licensing.basis }} |
+
+_Basis: **api** = derived from platform telemetry · **mixed** = telemetry + Git inspection · **survey** = SA judgement. Scores are a starting point; the SA may override any pillar in the report with narrative justification._
+{% endif %}
+
+---
+
+## 1. Platform Infrastructure
+
+| Attribute | Value |
+|---|---|
+| AAP / controller version | {{ lld_infrastructure.version | default('unknown') }} |
+| Controller HA | {{ 'Yes' if lld_infrastructure.ha | default(false) else 'No' }} |
+| Total instances | {{ lld_infrastructure.instance_count | default(0) }} |
+| Automation mesh present | {{ 'Yes' if lld_infrastructure.has_mesh | default(false) else 'No' }} |
+| Execution environments | {{ lld_infrastructure.execution_environments | default([]) | length }} |
+
+### 1.1 Instances (control plane topology)
+
+| Hostname | Node type | State | Enabled | Capacity | CPU | Memory |
+|---|---|---|---|---|---|---|
+{% for i in lld_infrastructure.instances | default([]) %}
+| {{ i.hostname | default('-') }} | {{ i.node_type | default('-') }} | {{ i.node_state | default('-') }} | {{ i.enabled | default('-') }} | {{ i.capacity | default('-') }} | {{ i.cpu | default('-') }} | {{ i.memory | default('-') }} |
+{% endfor %}
+
+### 1.2 Instance groups
+
+| Name | Container group | Min instances | Instance % | Max concurrent jobs | Max forks |
+|---|---|---|---|---|---|
+{% for g in lld_infrastructure.instance_groups | default([]) %}
+| {{ g.name | default('-') }} | {{ g.is_container_group | default('-') }} | {{ g.policy_instance_minimum | default('-') }} | {{ g.policy_instance_percentage | default('-') }} | {{ g.max_concurrent_jobs | default('-') }} | {{ g.max_forks | default('-') }} |
+{% endfor %}
+
+### 1.3 Execution environments
+
+| Name | Image | Pull policy |
+|---|---|---|
+{% for e in lld_infrastructure.execution_environments | default([]) %}
+| {{ e.name | default('-') }} | `{{ e.image | default('-') }}` | {{ e.pull | default('-') }} |
+{% endfor %}
+
+---
+
+## 2. Access & RBAC
+
+| Attribute | Value |
+|---|---|
+| Organizations | {{ lld_rbac.org_count | default(0) }} |
+| Teams | {{ lld_rbac.team_count | default(0) }} |
+| Users | {{ lld_rbac.user_count | default(0) }} |
+| Superusers | {{ lld_rbac.superuser_count | default(0) }} |
+| System auditors | {{ lld_rbac.auditor_count | default(0) }} |
+| Credentials (count) | {{ lld_rbac.credential_count | default(0) }} |
+| External secret backends | {{ (lld_rbac.external_secret_backends | default([]) | join(', ')) or 'none detected' }} |
+
+### 2.1 Organizations
+
+| Name | Description | Max hosts |
+|---|---|---|
+{% for o in lld_rbac.organizations | default([]) %}
+| {{ o.name | default('-') }} | {{ o.description | default('') }} | {{ o.max_hosts | default('-') }} |
+{% endfor %}
+
+---
+
+## 3. Content
+
+| Attribute | Value |
+|---|---|
+| Projects | {{ lld_content.project_count | default(0) }} |
+| Git-backed projects | {{ lld_content.git_project_count | default(0) }} |
+| Manual (non-SCM) projects | {{ lld_content.manual_project_count | default(0) }} |
+| Inventories | {{ lld_content.inventory_count | default(0) }} |
+| Total managed hosts | {{ lld_content.total_managed_hosts | default(0) }} |
+| Private hub collections | {{ lld_content.private_hub_collection_count | default(0) }} |
+
+### 3.1 Projects (source of automation content)
+
+| Name | SCM type | URL | Branch | Update on launch | Status |
+|---|---|---|---|---|---|
+{% for p in lld_content.projects | default([]) %}
+| {{ p.name | default('-') }} | {{ p.scm_type | default('manual') or 'manual' }} | {{ p.scm_url | default('-') or '-' }} | {{ p.scm_branch | default('-') or '-' }} | {{ p.scm_update_on_launch | default('-') }} | {{ p.status | default('-') }} |
+{% endfor %}
+
+### 3.2 Inventories
+
+| Name | Kind | Hosts | Groups | Has sources |
+|---|---|---|---|---|
+{% for inv in lld_content.inventories | default([]) %}
+| {{ inv.name | default('-') }} | {{ inv.kind | default('static') or 'static' }} | {{ inv.total_hosts | default(0) }} | {{ inv.total_groups | default(0) }} | {{ inv.has_inventory_sources | default('-') }} |
+{% endfor %}
+
+{% if lld_content.inventory_source_types | default([]) | length > 0 %}
+**Inventory source types in use:** {{ lld_content.inventory_source_types | join(', ') }}
+{% endif %}
+
+---
+
+## 4. Automation Assets
+
+| Attribute | Value |
+|---|---|
+| Job templates | {{ lld_automation.job_template_count | default(0) }} |
+| Workflow job templates | {{ lld_automation.workflow_count | default(0) }} |
+| Schedules | {{ lld_automation.schedule_count | default(0) }} |
+| Webhook-enabled templates | {{ lld_automation.webhook_enabled_templates | default(0) }} |
+
+### 4.1 Job templates
+
+| Name | Type | Playbook | Forks | Webhook | Survey |
+|---|---|---|---|---|---|
+{% for jt in lld_automation.job_templates | default([]) %}
+| {{ jt.name | default('-') }} | {{ jt.job_type | default('-') }} | `{{ jt.playbook | default('-') }}` | {{ jt.forks | default('-') }} | {{ jt.webhook_service | default('') or '-' }} | {{ jt.survey_enabled | default('-') }} |
+{% endfor %}
+
+### 4.2 Schedules
+
+| Name | Enabled | Recurrence (rrule) |
+|---|---|---|
+{% for s in lld_automation.schedules | default([]) %}
+| {{ s.name | default('-') }} | {{ s.enabled | default('-') }} | `{{ s.rrule | default('-') }}` |
+{% endfor %}
+
+**Recent job launch mix:** {% for k, v in (lld_automation.recent_launch_types | default({})).items() %}{{ k }}={{ v }}{{ ", " if not loop.last }}{% endfor %}
+
+{% if lld_automation.notification_types | default([]) | length > 0 %}
+**Notification integrations:** {{ lld_automation.notification_types | join(', ') }}
+{% endif %}
+
+---
+
+## 5. Event-Driven Automation (EDA)
+
+| Attribute | Value |
+|---|---|
+| EDA reachable | {{ 'Yes' if lld_event_driven.eda_reachable | default(false) else 'No / not present' }} |
+| Rulebook activations | {{ lld_event_driven.activation_count | default(0) }} |
+| Running activations | {{ lld_event_driven.running_count | default(0) }} |
+| Rulebooks | {{ lld_event_driven.rulebook_count | default(0) }} |
+| EDA projects | {{ lld_event_driven.project_count | default(0) }} |
+| Decision environments | {{ lld_event_driven.decision_environment_count | default(0) }} |
+
+{% if lld_event_driven.activations | default([]) | length > 0 %}
+### 5.1 Rulebook activations
+
+| Name | Status | Restart policy |
+|---|---|---|
+{% for a in lld_event_driven.activations | default([]) %}
+| {{ a.name | default('-') }} | {{ a.status | default('-') }} | {{ a.restart_policy | default('-') }} |
+{% endfor %}
+{% else %}
+_No EDA activations detected — event-driven automation not yet adopted (Track 02 opportunity)._
+{% endif %}
+
+---
+
+## 6. Subscription & Entitlement
+
+| Attribute | Value |
+|---|---|
+| License type | {{ lld_licensing.license_type | default('unknown') }} |
+| Subscription | {{ lld_licensing.subscription_name | default('unknown') }} |
+| Entitled managed nodes | {{ lld_licensing.instance_count_entitled | default('-') }} |
+| Currently consumed | {{ lld_licensing.current_instances | default('-') }} |
+| Utilization | {{ lld_licensing.utilization_pct | default('-') }}% |
+| Compliant | {{ 'Yes' if lld_licensing.compliant | default(true) else 'No' }} |
+| Days remaining | {{ lld_licensing.time_remaining_days | default('-') }} |
+
+{% if lld_job_analytics is defined and lld_job_analytics.jobs_analysed | default(0) | int > 0 %}
+---
+
+## 7. Job Execution Analytics
+
+_Derived from the {{ lld_job_analytics.jobs_analysed }} most recent job runs — feeds Pillar 2 (toil), Pillar 6 (MTTR baseline), and the ROI model._
+
+| Metric | Value |
+|---|---|
+| Jobs analysed | {{ lld_job_analytics.jobs_analysed }} |
+| Success rate | {{ lld_job_analytics.success_rate_pct }}% |
+| Failure rate | {{ lld_job_analytics.failure_rate_pct }}% |
+| Avg. job duration | {{ lld_job_analytics.avg_elapsed_seconds }} s |
+| Longest job | {{ lld_job_analytics.max_elapsed_seconds }} s |
+
+**Busiest templates (run frequency — automation hot-spots):**
+{% for name, count in (lld_job_analytics.top_templates_by_runs | default({})).items() | sort(attribute='1', reverse=true) %}
+{% if loop.index <= 8 %}- {{ name }} — {{ count }} runs
+{% endif %}
+{% endfor %}
+
+{% if (lld_job_analytics.failing_templates | default({})) | length > 0 %}
+**Templates with failures (closed-loop remediation candidates):**
+{% for name, count in (lld_job_analytics.failing_templates | default({})).items() | sort(attribute='1', reverse=true) %}
+{% if loop.index <= 8 %}- {{ name }} — {{ count }} failures
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if lld_rbac_depth is defined and lld_rbac_depth.role_count is defined %}
+---
+
+## 8. RBAC Depth
+
+| Metric | Value |
+|---|---|
+| Role definitions | {{ lld_rbac_depth.role_count }} |
+| Admin-type role assignments | {{ lld_rbac_depth.admin_role_assignments }} |
+| Execute-type role assignments | {{ lld_rbac_depth.execute_role_assignments }} |
+| Templates sampled for access | {{ lld_rbac_depth.sampled_templates }} |
+| Total access entries (sampled) | {{ lld_rbac_depth.access_entries_total }} |
+| Separation-of-duties signal | {{ 'Present' if lld_rbac_depth.separation_of_duties_signal else 'Not detected' }} |
+{% endif %}
+
+{% if lld_bundle.meta.git_inspection_enabled | default(false) and lld_git.totals is defined %}
+---
+
+## 9. Git / SCM Content Inspection
+
+_Read-only clone-and-inspect of Git-backed projects. Feeds Pillar 3 (content), Pillar 4 (secrets), Pillar 5 (CI/testing)._
+
+| Metric | Value |
+|---|---|
+| Repos cloned / failed | {{ lld_git.totals.repos_cloned | default(0) }} / {{ lld_git.totals.repos_failed | default(0) }} |
+| Repos with roles | {{ lld_git.totals.repos_with_roles | default(0) }} |
+| Repos with lint/yamllint | {{ lld_git.totals.repos_with_lint | default(0) }} |
+| Repos with Molecule | {{ lld_git.totals.repos_with_molecule | default(0) }} |
+| Repos with CI pipeline | {{ lld_git.totals.repos_with_ci | default(0) }} |
+| Repos with config-as-code | {{ lld_git.totals.repos_with_cac | default(0) }} |
+| Duplicated role names (reuse gap) | {{ lld_git.duplicated_role_count | default(0) }} |
+| **Potential plaintext secrets** | **{{ lld_git.totals.secret_hits | default(0) }}** |
+
+{% if (lld_git.totals.secret_hits | default(0) | int) > 0 %}
+> ⚠ **Security finding:** potential unvaulted secrets detected. Locations (file · line · pattern) are in `lld_bundle.json` under `git.repos[].secret_hits`. Values are never captured — only locations. Treat as a critical Pillar 4 finding requiring remediation.
+{% endif %}
+
+{% if (lld_git.duplicated_roles | default({})) | length > 0 %}
+**Roles duplicated across repos (copy-paste sprawl):** {% for n, c in (lld_git.duplicated_roles | default({})).items() %}{{ n }} (×{{ c }}){{ ", " if not loop.last }}{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if lld_survey is defined and lld_survey.ai_readiness is defined %}
+---
+
+## 10. Survey-Based Signals (SA input — not machine-derived)
+
+**Pillar 7 · AI / Reasoning Readiness** (score {{ lld_survey.ai_readiness.score | default('-') }}/5)
+- Leadership stance: {{ lld_survey.ai_readiness.leadership_stance | default('-') }}
+- Required control level: {{ lld_survey.ai_readiness.required_control_level | default('-') }}
+- Audit reconstruction: {{ lld_survey.ai_readiness.audit_reconstruction | default('-') }}
+- API/tool surface exposed: {{ lld_survey.ai_readiness.api_tool_surface_exposed | default('-') }}
+
+**Pillar 8 · Skills & Governance** (score {{ lld_survey.skills.score | default('-') }}/5)
+- Ownership model: {{ lld_survey.skills.ownership_model | default('-') }}
+- Skill distribution: {{ lld_survey.skills.skill_distribution | default('-') }}
+- CoE status: {{ lld_survey.skills.coe_status | default('-') }}
+- Change process: {{ lld_survey.skills.change_process | default('-') }}
+- Cultural trust: {{ lld_survey.skills.cultural_trust | default('-') }}
+
+{% if lld_survey.roi is defined and (lld_survey.roi.engineer_cost_per_hour | default(0) | int) > 0 %}
+**ROI baseline inputs (from survey):**
+- Engineer cost/hr: {{ lld_survey.roi.engineer_cost_per_hour }}
+- Provisioning hrs/mo: {{ lld_survey.roi.hours_month_provisioning }} · Patching/config hrs/mo: {{ lld_survey.roi.hours_month_patching_config }} · Compliance hrs/mo: {{ lld_survey.roi.hours_month_compliance_audit }}
+- Current MTTR: {{ lld_survey.roi.current_mttr_minutes }} min · Auto-remediable incidents/mo: {{ lld_survey.roi.incidents_month_auto_remediable }}
+{% endif %}
+{% endif %}
+
+---
+
+_Generated by the Gruve AAP LLD Extractor · Gruve Confidential · read-only extraction._

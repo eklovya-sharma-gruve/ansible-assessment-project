@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>AAP Low-Level Design — Northwind</title>
+<style>
+  :root{--deep:#062D1F;--mint:#00E96C;--mid:#1B5C43;--green:#21A55E;--tint:#EDF5F0;--ink:#1A1A1A;--muted:#5A6B62}
+  *{box-sizing:border-box}
+  body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--ink);max-width:1040px;margin:32px auto;padding:0 20px;line-height:1.55}
+  .hero{background:var(--deep);color:#fff;border-radius:10px;padding:26px 30px}
+  .hero .eyebrow{color:var(--mint);font-weight:700;letter-spacing:1.5px;font-size:12px}
+  .hero h1{margin:6px 0 4px;font-size:28px}
+  .hero .sub{color:#CCEEDF;font-size:14px}
+  h2{color:var(--deep);border-bottom:3px solid var(--mint);padding-bottom:6px;margin-top:36px;font-size:20px}
+  h3{color:var(--mid);font-size:15px;margin:22px 0 8px}
+  table{border-collapse:collapse;width:100%;margin:10px 0 18px;font-size:13px}
+  th{background:var(--mid);color:#fff;text-align:left;padding:8px 10px;font-weight:600}
+  td{padding:7px 10px;border-bottom:1px solid #E0EAE4;vertical-align:top}
+  tr:nth-child(even) td{background:var(--tint)}
+  .kv td:first-child{font-weight:600;color:var(--deep);width:38%}
+  code{background:#F1F5F2;padding:1px 5px;border-radius:4px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .note{background:var(--tint);border-left:4px solid var(--mint);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--muted)}
+  .foot{color:var(--muted);font-size:12px;margin-top:30px;border-top:1px solid #E0EAE4;padding-top:10px}
+  .pill{display:inline-block;background:#DBF0E3;color:#1E7A46;border-radius:10px;padding:1px 9px;font-size:12px;font-weight:600}
+  .warn{background:#FBE4E1;color:#C0392B}
+</style></head><body>
+
+<div class="hero">
+  <div class="eyebrow">GRUVE · RED HAT ADVANCED PARTNER</div>
+  <h1>AAP Low-Level Design (LLD)</h1>
+  <div class="sub">Northwind · generated 2026-08-03T17:45:58Z UTC · API: gateway</div>
+</div>
+
+<p class="note">Read-only extraction from the platform API. Use these tables to populate the technical assessment report's environment and current-state sections.</p>
+
+<h2>1 · Platform Infrastructure</h2>
+<table class="kv">
+  <tr><td>AAP / controller version</td><td>4.6.7</td></tr>
+  <tr><td>Controller HA</td><td>Yes</td></tr>
+  <tr><td>Total instances</td><td>4</td></tr>
+  <tr><td>Automation mesh present</td><td>Yes</td></tr>
+</table>
+
+<h3>1.1 Instances</h3>
+<table><tr><th>Hostname</th><th>Node type</th><th>State</th><th>Enabled</th><th>Capacity</th><th>CPU</th><th>Memory</th></tr>
+<tr><td>aap-ctrl-1</td><td>control</td><td>ready</td><td>True</td><td>148</td><td>8</td><td>32.0 GB</td></tr>
+<tr><td>aap-ctrl-2</td><td>control</td><td>ready</td><td>True</td><td>148</td><td>8</td><td>32.0 GB</td></tr>
+<tr><td>aap-exec-1</td><td>execution</td><td>ready</td><td>True</td><td>296</td><td>16</td><td>64.0 GB</td></tr>
+<tr><td>aap-hop-1</td><td>hop</td><td>ready</td><td>True</td><td>0</td><td>4</td><td>8.0 GB</td></tr>
+</table>
+
+<h3>1.2 Instance groups</h3>
+<table><tr><th>Name</th><th>Container</th><th>Min inst.</th><th>Inst. %</th><th>Max jobs</th><th>Max forks</th></tr>
+<tr><td>controlplane</td><td>False</td><td>2</td><td>100</td><td>0</td><td>0</td></tr>
+<tr><td>default</td><td>False</td><td>1</td><td>100</td><td>0</td><td>0</td></tr>
+<tr><td>ocp-ee</td><td>True</td><td>0</td><td>0</td><td>50</td><td>200</td></tr>
+</table>
+
+<h3>1.3 Execution environments</h3>
+<table><tr><th>Name</th><th>Image</th><th>Pull</th></tr>
+<tr><td>Default execution environment</td><td><code>registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest</code></td><td>missing</td></tr>
+<tr><td>Gruve custom EE (network)</td><td><code>quay.io/gruve/ee-network:1.4</code></td><td>always</td></tr>
+</table>
+
+<h2>2 · Access &amp; RBAC</h2>
+<table class="kv">
+  <tr><td>Organizations</td><td>2</td></tr>
+  <tr><td>Teams</td><td>3</td></tr>
+  <tr><td>Users (superusers / auditors)</td><td>16 (1 / 1)</td></tr>
+  <tr><td>Credentials</td><td>19</td></tr>
+  <tr><td>External secret backends</td><td><span class="pill">HashiCorp Vault Secret Lookup</span></td></tr>
+</table>
+<table><tr><th>Organization</th><th>Description</th><th>Max hosts</th></tr>
+<tr><td>Default</td><td>Default org</td><td>0</td></tr>
+<tr><td>Infrastructure</td><td>Infra automation</td><td>2000</td></tr>
+</table>
+
+<h2>3 · Content</h2>
+<table class="kv">
+  <tr><td>Projects (Git / manual)</td><td>4 (3 / 1)</td></tr>
+  <tr><td>Inventories</td><td>3</td></tr>
+  <tr><td>Total managed hosts</td><td>980</td></tr>
+  <tr><td>Private hub collections</td><td>2</td></tr>
+</table>
+<h3>3.1 Projects</h3>
+<table><tr><th>Name</th><th>SCM</th><th>URL</th><th>Branch</th><th>Status</th></tr>
+<tr><td>infra-playbooks</td><td>git</td><td><code>https://git.example.com/infra/playbooks.git</code></td><td>main</td><td>successful</td></tr>
+<tr><td>network-automation</td><td>git</td><td><code>https://git.example.com/net/automation.git</code></td><td>main</td><td>successful</td></tr>
+<tr><td>security-baselines</td><td>git</td><td><code>https://git.example.com/sec/baselines.git</code></td><td>prod</td><td>successful</td></tr>
+<tr><td>legacy-scripts</td><td>manual</td><td><code>-</code></td><td>-</td><td>successful</td></tr>
+</table>
+<h3>3.2 Inventories</h3>
+<table><tr><th>Name</th><th>Kind</th><th>Hosts</th><th>Groups</th><th>Sources</th></tr>
+<tr><td>Production</td><td>static</td><td>612</td><td>24</td><td>True</td></tr>
+<tr><td>Non-Prod</td><td>static</td><td>228</td><td>12</td><td>True</td></tr>
+<tr><td>Network Devices (smart)</td><td>smart</td><td>140</td><td>0</td><td>False</td></tr>
+</table>
+
+<h2>4 · Automation Assets</h2>
+<table class="kv">
+  <tr><td>Job templates</td><td>5</td></tr>
+  <tr><td>Workflow templates</td><td>1</td></tr>
+  <tr><td>Schedules</td><td>2</td></tr>
+  <tr><td>Webhook-enabled templates</td><td>1</td></tr>
+  <tr><td>Recent launch mix</td><td>manual=120, scheduled=55, workflow=15, webhook=10</td></tr>
+</table>
+<h3>4.1 Job templates</h3>
+<table><tr><th>Name</th><th>Type</th><th>Playbook</th><th>Forks</th><th>Webhook</th><th>Survey</th></tr>
+<tr><td>RHEL Patch - Prod</td><td>run</td><td><code>patch.yml</code></td><td>20</td><td>-</td><td>True</td></tr>
+<tr><td>Provision VM (vSphere)</td><td>run</td><td><code>provision.yml</code></td><td>10</td><td>-</td><td>True</td></tr>
+<tr><td>Network Backup</td><td>run</td><td><code>net_backup.yml</code></td><td>25</td><td>-</td><td>False</td></tr>
+<tr><td>App Deploy (CI-triggered)</td><td>run</td><td><code>deploy.yml</code></td><td>5</td><td>github</td><td>False</td></tr>
+<tr><td>CIS Hardening</td><td>run</td><td><code>cis.yml</code></td><td>15</td><td>-</td><td>True</td></tr>
+</table>
+<h3>4.2 Schedules</h3>
+<table><tr><th>Name</th><th>Enabled</th><th>Recurrence</th></tr>
+<tr><td>Nightly patch window</td><td>True</td><td><code>DTSTART:20250101T020000Z RRULE:FREQ=DAILY;INTERVAL=1</code></td></tr>
+<tr><td>Weekly network backup</td><td>True</td><td><code>DTSTART:20250105T030000Z RRULE:FREQ=WEEKLY;BYDAY=SU</code></td></tr>
+</table>
+
+<h2>5 · Event-Driven Automation</h2>
+<table class="kv">
+  <tr><td>EDA reachable</td><td>Yes</td></tr>
+  <tr><td>Activations (running)</td><td>0 (0)</td></tr>
+  <tr><td>Rulebooks</td><td>0</td></tr>
+  <tr><td>Decision environments</td><td>0</td></tr>
+</table>
+<p class="note">No EDA activations detected — event-driven automation not yet adopted (Track 02 opportunity).</p>
+
+<h2>6 · Subscription &amp; Entitlement</h2>
+<table class="kv">
+  <tr><td>License / subscription</td><td>enterprise · AAP - 1000 Managed Nodes</td></tr>
+  <tr><td>Entitled / consumed</td><td>1000 / 980</td></tr>
+  <tr><td>Utilization</td><td>98%</td></tr>
+  <tr><td>Compliant</td><td><span class="pill">Yes</span></td></tr>
+  <tr><td>Days remaining</td><td>100</td></tr>
+</table>
+
+<div class="foot">Generated by the Gruve AAP LLD Extractor · Gruve Confidential · read-only extraction from http://127.0.0.1:8113.</div>
+</body></html>

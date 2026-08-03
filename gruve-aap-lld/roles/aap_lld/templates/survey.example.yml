@@ -1,0 +1,48 @@
+---
+# SA discovery survey — the inputs no API can observe.
+# Fill during the workshop, pass via survey_file, or edit these defaults.
+# Merges into the LLD bundle so the report covers all 9 pillars + ROI.
+
+# --- Pillar 7: AI / Reasoning Readiness ---
+ai_readiness:
+  score: 2                              # 1-5 SA judgement
+  leadership_stance: "cautious"         # enthusiastic | cautious | blocked
+  required_control_level: "full_hitl"   # full_hitl | tiered | autonomous_low_risk
+  audit_reconstruction: "partial"       # strong | partial | weak
+  api_tool_surface_exposed: false
+  high_value_use_cases: []              # e.g. ["incident classification", "noise reduction"]
+  context_systems: []                   # e.g. ["ServiceNow", "Prometheus", "CMDB"]
+  notes: ""
+
+# --- Pillar 8: Skills & Governance ---
+skills:
+  score: 2
+  ownership_model: "siloed"             # platform_team | coe | siloed
+  skill_distribution: "few_experts"     # broad | few_experts
+  coe_status: "aspirational"            # active | aspirational | none
+  change_process: "informal"            # formal | informal | none
+  cultural_trust: "mixed"               # trusted | mixed | routed_around
+  onboarding: "ad_hoc"                  # documented | ad_hoc | none
+  notes: ""
+
+# --- Interview-only signals for other pillars (optional, enrich findings) ---
+interview:
+  dr_failover_tested: false             # Pillar 1 — config is visible, "tested" is a claim
+  top_manual_tasks: []                  # Pillar 2 — subjective pain points
+  monitoring_tools: []                  # Pillar 6 — ["Splunk","Prometheus","SolarWinds"]
+  itsm_platform: ""                     # Pillar 6 — "ServiceNow" | "Jira" | ...
+  auto_remediation_candidates: []       # Pillar 6
+  renewal_date: ""                      # Pillar 9 — "2026-03-01"
+  expansion_appetite: ""                # Pillar 9 — free text
+
+# --- ROI baseline inputs (Pillar 2/6/9 → ROI model) ---
+roi:
+  engineer_cost_per_hour: 0
+  hours_month_provisioning: 0
+  hours_month_patching_config: 0
+  hours_month_compliance_audit: 0
+  incidents_month_auto_remediable: 0
+  current_mttr_minutes: 0
+  failed_change_windows_year: 0
+  avg_cost_per_failed_change: 0
+  annual_compliance_exposure: 0

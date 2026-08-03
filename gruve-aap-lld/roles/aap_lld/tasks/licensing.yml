@@ -1,0 +1,28 @@
+---
+# Subscription / entitlement LLD.
+- name: Get controller config (license info)
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ aap_prefix.controller }}/config/"
+    method: GET
+    headers: { Authorization: "Bearer {{ aap_token }}", Accept: "application/json" }
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+  register: _config
+  no_log: true
+  failed_when: false
+
+- name: Set license base fact
+  ansible.builtin.set_fact:
+    _lic: "{{ _config.json.license_info | default({}) }}"
+
+- name: Distil licensing LLD
+  ansible.builtin.set_fact:
+    lld_licensing:
+      license_type: "{{ _lic.license_type | default('unknown') }}"
+      subscription_name: "{{ _lic.subscription_name | default('unknown') }}"
+      instance_count_entitled: "{{ _lic.instance_count | default(0) }}"
+      current_instances: "{{ _lic.current_instances | default(0) }}"
+      free_instances: "{{ _lic.free_instances | default(0) }}"
+      compliant: "{{ _lic.compliant | default(true) }}"
+      time_remaining_days: "{{ ((_lic.time_remaining | default(0) | int) // 86400) }}"
+      utilization_pct: "{{ ((_lic.current_instances | default(0) | int) * 100 // ([(_lic.instance_count | default(1) | int), 1] | max)) }}"

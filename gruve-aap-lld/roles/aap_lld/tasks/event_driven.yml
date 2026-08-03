@@ -1,0 +1,29 @@
+---
+# Event-Driven Ansible LLD.
+- name: Collect EDA activations
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.eda }}/activations/", fetch_fact: lld_eda_activations }
+
+- name: Collect EDA rulebooks
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.eda }}/rulebooks/", fetch_fact: lld_eda_rulebooks }
+
+- name: Collect EDA projects
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.eda }}/projects/", fetch_fact: lld_eda_projects }
+
+- name: Collect EDA decision environments
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.eda }}/decision-environments/", fetch_fact: lld_eda_des }
+
+- name: Distil event-driven LLD
+  ansible.builtin.set_fact:
+    lld_event_driven:
+      eda_reachable: "{{ (lld_eda_activations | length) >= 0 and (lld_collection_errors | default([]) | select('search','lld_eda_activations') | list | length) == 0 }}"
+      activation_count: "{{ lld_eda_activations | length }}"
+      activations: "{{ lld_eda_activations | map('gruve_pick', ['name','status','restart_policy','rulebook','decision_environment']) | list }}"
+      running_count: "{{ lld_eda_activations | selectattr('status','defined') | selectattr('status','in',['running','active']) | list | length }}"
+      rulebook_count: "{{ lld_eda_rulebooks | length }}"
+      project_count: "{{ lld_eda_projects | length }}"
+      decision_environment_count: "{{ lld_eda_des | length }}"
+      eda_in_use: "{{ (lld_eda_activations | length) > 0 }}"

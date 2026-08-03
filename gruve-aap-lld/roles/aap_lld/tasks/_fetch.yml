@@ -1,0 +1,55 @@
+---
+# Paginated GET against an AAP API path, aggregating all pages into a fact.
+# Inputs:
+#   fetch_url        : full path starting with the service prefix (e.g. "{{ aap_prefix.controller }}/instances/")
+#   fetch_fact       : name of the fact to store the aggregated 'results' list into
+# Uses aap_hostname, aap_token, aap_validate_certs, lld_page_size, lld_max_pages.
+#
+# Defensive: on any HTTP error the fact is set to [] and a note is appended to
+# lld_collection_errors, so one missing endpoint never aborts the run.
+
+- name: "Init aggregate for {{ fetch_fact }}"
+  ansible.builtin.set_fact:
+    _agg: []
+    _next: "{{ fetch_url }}?page_size={{ lld_page_size }}"
+    _pages: 0
+
+- name: "Page through {{ fetch_fact }}"
+  ansible.builtin.uri:
+    url: "{{ aap_hostname }}{{ _next }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ aap_token }}"
+      Accept: "application/json"
+    validate_certs: "{{ aap_validate_certs }}"
+    return_content: true
+    status_code: [200]
+  register: _resp
+  no_log: true
+  until: (_resp.status == 200) or (_pages >= lld_max_pages)
+  retries: 2
+  delay: 2
+  failed_when: false
+
+- name: "Aggregate results for {{ fetch_fact }}"
+  ansible.builtin.set_fact:
+    _agg: "{{ _agg + (_resp.json.results | default([])) }}"
+    _next: "{{ (_resp.json.next | default('')) if (_resp.json.next is defined and _resp.json.next) else '' }}"
+    _pages: "{{ _pages | int + 1 }}"
+  when: _resp.status is defined and _resp.status == 200
+
+# Loop pages while 'next' is present (bounded by lld_max_pages)
+- name: "Continue paging {{ fetch_fact }}"
+  ansible.builtin.include_tasks: _paginate_more.yml
+  when:
+    - _next | length > 0
+    - _pages | int < lld_max_pages
+
+- name: "Record collection error for {{ fetch_fact }}"
+  ansible.builtin.set_fact:
+    lld_collection_errors: "{{ (lld_collection_errors | default([])) + [fetch_fact ~ ' (HTTP ' ~ (_resp.status | default('n/a')) ~ ')'] }}"
+  when: _resp.status is not defined or _resp.status != 200
+
+- name: "Store {{ fetch_fact }}"
+  ansible.builtin.set_fact:
+    "{{ fetch_fact }}": "{{ _agg }}"
