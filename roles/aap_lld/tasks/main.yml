@@ -121,16 +121,21 @@
       lld_managed_hosts: "{{ lld_content.total_managed_hosts | default(0) }}"
       lld_maturity_index: "{{ lld_maturity_index | default('n/a') }}"
       lld_collection_errors: "{{ lld_collection_errors | default([]) }}"
+- name: Create AAP artifact directory
+  ansible.builtin.file:
+    path: "/runner/artifacts/{{ lookup('ansible.builtin.env', 'JOB_ID') }}"
+    state: directory
+    mode: "0755"
 
-- name: Check persistent storage
-  ansible.builtin.command:
-    cmd: df -h
-  register: storage_check
-  changed_when: false
-
-- debug:
-    var: storage_check.stdout
-
+- name: Copy reports to AAP artifacts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/runner/artifacts/{{ lookup('ansible.builtin.env', 'JOB_ID') }}/"
+    remote_src: true
+  loop:
+    - "{{ lld_output_dir }}/lld_bundle.json"
+    - "{{ lld_output_dir }}/lld_report.md"
+    - "{{ lld_output_dir }}/lld_report.html"
 
 - name: Print summary
   ansible.builtin.debug:
