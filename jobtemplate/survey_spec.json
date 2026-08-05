@@ -3,10 +3,10 @@
   "description": "Read-only low-level design + maturity extraction for the assessment technical report.",
   "spec": [
     {
-      "question_name": "Read-only AAP token",
-      "question_description": "OAuth token from a read-only/auditor account (User > Tokens, scope: read).",
-      "variable": "aap_token",
-      "type": "password",
+      "question_name": "Controller Hostname",
+      "question_description": "Hostname for the controller.",
+      "variable": "aap_hostname",
+      "type": "text",
       "required": true
     },
     {
@@ -17,6 +17,13 @@
       "required": true,
       "default": "[CUSTOMER NAME]"
     },
+    {
+      "question_name": "Read-only AAP token",
+      "question_description": "OAuth token from a read-only/auditor account (User > Tokens, scope: read).",
+      "variable": "aap_token",
+      "type": "password",
+      "required": true
+    },   
     {
       "question_name": "API flavour",
       "question_description": "gateway = AAP 2.5+, legacy = AAP 2.4",
