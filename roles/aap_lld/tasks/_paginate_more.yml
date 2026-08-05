@@ -18,8 +18,14 @@
   ansible.builtin.set_fact:
     _agg: "{{ _agg + (_resp.json.results | default([])) }}"
     _next: "{{ (_resp.json.next | default('')) if (_resp.json.next is defined and _resp.json.next) else '' }}"
-    _pages: "{{ _pages | int + 1 }}"
+    _pages: "{{ (_pages | int) + 1 }}"
   when: _resp.status is defined and _resp.status == 200
+
+- name: Debug pagination
+  ansible.builtin.debug:
+    msg:
+      pages: "{{ _pages }}"
+      next: "{{ _next }}"
 
 - name: "Recurse if more pages"
   ansible.builtin.include_tasks: _paginate_more.yml
