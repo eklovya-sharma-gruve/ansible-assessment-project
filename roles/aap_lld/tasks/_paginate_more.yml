@@ -11,7 +11,7 @@
     return_content: true
     status_code: [200]
   register: _resp
-  no_log: true
+  #no_log: true
   failed_when: false
 
 - name: "Aggregate next page"
