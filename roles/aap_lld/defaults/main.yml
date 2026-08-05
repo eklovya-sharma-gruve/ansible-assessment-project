@@ -6,7 +6,6 @@
 # Base URL of the platform. On the controller itself, CONTROLLER_HOST is injected.
 aap_hostname: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') | default('', true) }}"
 # Read-only OAuth token (User > Tokens, scope: read). Provide via masked survey var.
-aap_token: ""
 aap_validate_certs: true
 
 # --- API flavour ---
