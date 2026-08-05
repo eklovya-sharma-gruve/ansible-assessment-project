@@ -122,6 +122,16 @@
       lld_maturity_index: "{{ lld_maturity_index | default('n/a') }}"
       lld_collection_errors: "{{ lld_collection_errors | default([]) }}"
 
+- name: Check persistent storage
+  ansible.builtin.command:
+    cmd: df -h
+  register: storage_check
+  changed_when: false
+
+- debug:
+    var: storage_check.stdout
+
+
 - name: Print summary
   ansible.builtin.debug:
     msg:
