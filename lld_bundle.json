@@ -1,0 +1,596 @@
+{
+    "automation": {
+        "job_template_count": "18",
+        "job_templates": [
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "ansible-assessment-run",
+                "playbook": "playbooks/lld_extract.yml",
+                "survey_enabled": true,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "check-disk-usage",
+                "playbook": "playbooks/check-disk.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "check-essential-services",
+                "playbook": "playbooks/check-services.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "Demo Job Template",
+                "playbook": "hello_world.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "install-node-exporter",
+                "playbook": "playbooks/install-node-exporter.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "meraki-device-down",
+                "playbook": "playbooks/meraki-device-down.yaml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "miraki internet down",
+                "playbook": "playbooks/meraki-internet-down.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "noc-resolve-incident",
+                "playbook": "playbooks/noc-resolve-incident.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "Patch RHEL VMs",
+                "playbook": "playbooks/patch-rhel.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "remediate-service",
+                "playbook": "playbooks/remediate-service.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "restart service",
+                "playbook": "playbooks/restart-service.yml",
+                "survey_enabled": true,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "satellite-vulnerability-sync",
+                "playbook": "playbooks/satellite-sync-vulnerabilities.yml",
+                "survey_enabled": false,
+                "verbosity": 1,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "snow-add-notes",
+                "playbook": "playbooks/snow-add-notes.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "snow-create-incident",
+                "playbook": "playbooks/snow-create-incident.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "forks": 0,
+                "job_type": "run",
+                "name": "snow-resolve-incident",
+                "playbook": "playbooks/snow-resolve-incident.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "vm-service-restart",
+                "playbook": "playbooks/vm-service-restart.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "vm-vulnerability-patch",
+                "playbook": "playbooks/vm-vulnerability-patch.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "forks": 0,
+                "job_type": "run",
+                "name": "vm-vulnerability-scan",
+                "playbook": "playbooks/vm-vulnerability-scan.yml",
+                "survey_enabled": false,
+                "verbosity": 0,
+                "webhook_service": ""
+            }
+        ],
+        "notification_types": [],
+        "recent_launch_types": {
+            "dependency": 48,
+            "manual": 80,
+            "relaunch": 8,
+            "scheduled": 35,
+            "sync": 1,
+            "workflow": 28
+        },
+        "schedule_count": "5",
+        "schedules": [
+            {
+                "enabled": true,
+                "name": "Cleanup Job Schedule",
+                "rrule": "DTSTART:20260416T164754Z RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU"
+            },
+            {
+                "enabled": true,
+                "name": "Cleanup Activity Schedule",
+                "rrule": "DTSTART:20260416T164754Z RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TU"
+            },
+            {
+                "enabled": true,
+                "name": "Cleanup Expired Sessions",
+                "rrule": "DTSTART:20260416T164829Z RRULE:FREQ=WEEKLY;INTERVAL=1"
+            },
+            {
+                "enabled": true,
+                "name": "Cleanup Expired OAuth 2 Tokens",
+                "rrule": "DTSTART:20260416T164829Z RRULE:FREQ=WEEKLY;INTERVAL=1"
+            },
+            {
+                "enabled": true,
+                "name": "gruve-noc-weekly-vuln-scan",
+                "rrule": "DTSTART;TZID=Asia/Kolkata:20260510T020000 RRULE:FREQ=WEEKLY;INTERVAL=1;WKST=SU"
+            }
+        ],
+        "webhook_enabled_templates": "0",
+        "workflow_count": "2",
+        "workflows": [
+            {
+                "name": "HAProxy not working Remediation Workflow",
+                "survey_enabled": true
+            },
+            {
+                "name": "meraki-remediation-workflow",
+                "survey_enabled": false
+            }
+        ]
+    },
+    "content": {
+        "git_project_count": "3",
+        "inventories": [
+            {
+                "has_inventory_sources": false,
+                "kind": "",
+                "name": "ansible-assessment-inventory",
+                "total_groups": 0,
+                "total_hosts": 1
+            },
+            {
+                "has_inventory_sources": false,
+                "kind": "",
+                "name": "Demo Inventory",
+                "total_groups": 0,
+                "total_hosts": 0
+            },
+            {
+                "has_inventory_sources": false,
+                "kind": "",
+                "name": "NJ-Infrastructure",
+                "total_groups": 0,
+                "total_hosts": 5
+            }
+        ],
+        "inventory_count": "3",
+        "inventory_source_types": [],
+        "manual_project_count": "0",
+        "private_hub_collection_count": "0",
+        "project_count": "3",
+        "projects": [
+            {
+                "name": "Demo Project",
+                "scm_branch": "",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": false,
+                "scm_url": "https://github.com/ansible/ansible-tower-samples",
+                "status": "successful"
+            },
+            {
+                "name": "automate-infra",
+                "scm_branch": "",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": true,
+                "scm_url": "https://github.com/hellogruve/ansible-infra",
+                "status": "successful"
+            },
+            {
+                "name": "ansible-assessment-test",
+                "scm_branch": "main",
+                "scm_refspec": "",
+                "scm_type": "git",
+                "scm_update_on_launch": false,
+                "scm_url": "https://github.com/eklovya-sharma-gruve/ansible-assessment-project.git",
+                "status": "successful"
+            }
+        ],
+        "total_managed_hosts": "6"
+    },
+    "event_driven": {
+        "activation_count": "2",
+        "activations": [
+            {
+                "decision_environment": null,
+                "name": "gruve-noc-meraki-rules",
+                "restart_policy": "on-failure",
+                "rulebook": null,
+                "status": "failed"
+            },
+            {
+                "decision_environment": null,
+                "name": "RHEL Event Listener",
+                "restart_policy": "on-failure",
+                "rulebook": null,
+                "status": "failed"
+            }
+        ],
+        "decision_environment_count": "1",
+        "eda_in_use": true,
+        "eda_reachable": true,
+        "project_count": "2",
+        "rulebook_count": "4",
+        "running_count": "0"
+    },
+    "git": {},
+    "infrastructure": {
+        "execution_environments": [
+            {
+                "image": "registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9@sha256:0c3b74f2b6b9eb8f4a144e10b27208c53bc104fb548b0371f905150f75fe6861",
+                "name": "Control Plane Execution Environment",
+                "pull": ""
+            },
+            {
+                "image": "registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9@sha256:0c3b74f2b6b9eb8f4a144e10b27208c53bc104fb548b0371f905150f75fe6861",
+                "name": "Default execution environment",
+                "pull": ""
+            },
+            {
+                "image": "registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9@sha256:fece6795d24aed2d5a6d461a87f6a664cc630bfdd659cc535f4a0f8beaba57d5",
+                "name": "Minimal execution environment",
+                "pull": ""
+            }
+        ],
+        "ha": false,
+        "has_mesh": false,
+        "instance_count": "1",
+        "instance_groups": [
+            {
+                "is_container_group": false,
+                "max_concurrent_jobs": 0,
+                "max_forks": 0,
+                "name": "controlplane",
+                "policy_instance_minimum": 0,
+                "policy_instance_percentage": 100
+            },
+            {
+                "is_container_group": true,
+                "max_concurrent_jobs": 0,
+                "max_forks": 0,
+                "name": "default",
+                "policy_instance_minimum": 0,
+                "policy_instance_percentage": 100
+            }
+        ],
+        "instances": [
+            {
+                "capacity": 5150,
+                "cpu": "64.0",
+                "enabled": true,
+                "hostname": "aap-controller-task-fdc49f4f-wvhvk",
+                "ip_address": "10.131.2.84",
+                "memory": 540104888320,
+                "node_state": "ready",
+                "node_type": "control"
+            }
+        ],
+        "node_types": [
+            "control"
+        ],
+        "version": "4.7.15"
+    },
+    "job_analytics": {
+        "avg_elapsed_seconds": "110.3",
+        "failed_count": "52",
+        "failing_templates": {
+            "ansible-assessment-run": 26,
+            "satellite-vulnerability-sync": 19,
+            "snow-create-incident": 3,
+            "snow-resolve-incident": 1,
+            "vm-vulnerability-patch": 1,
+            "vm-vulnerability-scan": 2
+        },
+        "failure_rate_pct": "26",
+        "jobs_analysed": "200",
+        "max_elapsed_seconds": "17948.886",
+        "status_breakdown": {
+            "canceled": 4,
+            "failed": 52,
+            "pending": 1,
+            "running": 1,
+            "successful": 142
+        },
+        "success_count": "142",
+        "success_rate_pct": "71",
+        "top_templates_by_runs": {
+            "ansible-assessment-run": 40,
+            "check-disk-usage": 4,
+            "meraki-device-down": 1,
+            "noc-resolve-incident": 13,
+            "satellite-vulnerability-sync": 39,
+            "snow-add-notes": 13,
+            "snow-create-incident": 17,
+            "snow-resolve-incident": 14,
+            "vm-service-restart": 13,
+            "vm-vulnerability-patch": 20,
+            "vm-vulnerability-scan": 26
+        }
+    },
+    "licensing": {
+        "compliant": true,
+        "current_instances": "6",
+        "free_instances": "10",
+        "instance_count_entitled": "16",
+        "license_type": "developer",
+        "subscription_name": "Red Hat Developer Subscription for Individuals",
+        "time_remaining_days": "127",
+        "utilization_pct": "37"
+    },
+    "maturity_index": "2.33",
+    "meta": {
+        "aap_api_flavour": "gateway",
+        "collection_errors": [],
+        "customer": "[CUSTOMER NAME]",
+        "generated_utc": "2026-08-12T21:10:52Z",
+        "git_inspection_enabled": false,
+        "source_host": "https://aap-aap.apps.ocp-mig2.gruveai.com",
+        "survey_source": "defaults"
+    },
+    "rbac": {
+        "auditor_count": "0",
+        "credential_count": "6",
+        "credential_type_summary": [
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 2,
+                    "name": "Source Control"
+                }
+            },
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 19,
+                    "name": "Ansible Galaxy/Automation Hub API Token"
+                }
+            },
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 1,
+                    "name": "Machine"
+                }
+            },
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 2,
+                    "name": "Source Control"
+                }
+            },
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 8,
+                    "name": "Red Hat Satellite 6"
+                }
+            },
+            {
+                "credential_type": {
+                    "description": "",
+                    "id": 1,
+                    "name": "Machine"
+                }
+            }
+        ],
+        "external_secret_backends": [
+            "AWS Secrets Manager lookup",
+            "Centrify Vault Credential Provider Lookup",
+            "CyberArk Central Credential Provider Lookup",
+            "CyberArk Conjur Secrets Manager Lookup",
+            "GitHub App Installation Access Token Lookup",
+            "HashiCorp Vault Secret Lookup",
+            "HashiCorp Vault Signed SSH",
+            "Microsoft Azure Key Vault",
+            "Thycotic DevOps Secrets Vault",
+            "Thycotic Secret Server"
+        ],
+        "org_count": "1",
+        "organizations": [
+            {
+                "description": "The default organization for Ansible Automation Platform",
+                "max_hosts": 0,
+                "name": "Default"
+            }
+        ],
+        "superuser_count": "5",
+        "team_count": "0",
+        "teams": [],
+        "user_count": "6"
+    },
+    "rbac_depth": {
+        "access_entries_total": "75",
+        "admin_role_assignments": "43",
+        "execute_role_assignments": "21",
+        "role_count": "128",
+        "sampled_templates": "15",
+        "separation_of_duties_signal": true
+    },
+    "scores": {
+        "ai_readiness": {
+            "basis": "survey",
+            "score": "2"
+        },
+        "cicd": {
+            "basis": "api",
+            "score": "2"
+        },
+        "content": {
+            "basis": "api",
+            "score": "2"
+        },
+        "coverage": {
+            "basis": "api",
+            "score": "2"
+        },
+        "event_driven": {
+            "basis": "api",
+            "score": "4"
+        },
+        "infrastructure": {
+            "basis": "api",
+            "score": "2"
+        },
+        "licensing": {
+            "basis": "api",
+            "score": "2"
+        },
+        "security": {
+            "basis": "api",
+            "score": "3"
+        },
+        "skills": {
+            "basis": "survey",
+            "score": "2"
+        }
+    },
+    "survey": {
+        "ai_readiness": {
+            "api_tool_surface_exposed": false,
+            "audit_reconstruction": "partial",
+            "context_systems": [],
+            "high_value_use_cases": [],
+            "leadership_stance": "cautious",
+            "notes": "",
+            "required_control_level": "full_hitl",
+            "score": 2
+        },
+        "interview": {
+            "auto_remediation_candidates": [],
+            "dr_failover_tested": false,
+            "expansion_appetite": "",
+            "itsm_platform": "",
+            "monitoring_tools": [],
+            "renewal_date": "",
+            "top_manual_tasks": []
+        },
+        "roi": {
+            "annual_compliance_exposure": 0,
+            "avg_cost_per_failed_change": 0,
+            "current_mttr_minutes": 0,
+            "engineer_cost_per_hour": 0,
+            "failed_change_windows_year": 0,
+            "hours_month_compliance_audit": 0,
+            "hours_month_patching_config": 0,
+            "hours_month_provisioning": 0,
+            "incidents_month_auto_remediable": 0
+        },
+        "skills": {
+            "change_process": "informal",
+            "coe_status": "aspirational",
+            "cultural_trust": "mixed",
+            "notes": "",
+            "onboarding": "ad_hoc",
+            "ownership_model": "siloed",
+            "score": 2,
+            "skill_distribution": "few_experts"
+        }
+    }
+}
