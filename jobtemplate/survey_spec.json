@@ -65,5 +65,13 @@
       "required": false,
       "default": ""
     }
+    {
+      "question_name": "Output GitHub Token",
+      "question_description": "Token of Github repo to write output",
+      "variable": "github_token",
+      "type": "password",
+      "required": false,
+      "default": ""
+    }
   ]
 }

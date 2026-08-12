@@ -172,6 +172,12 @@
     chdir: /tmp/myrepo
   register: git_status
   changed_when: false
+- name: Check git add
+  ansible.builtin.command:
+    cmd: git add .
+    chdir: /tmp/myrepo
+  register: git_status
+  changed_when: false
 - name: Commit LLD bundle
   ansible.builtin.command:
     cmd: git commit -m "Update LLD bundle from Ansible"
