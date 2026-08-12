@@ -1,0 +1,45 @@
+---
+dns-resolver:
+  config:
+    server:
+      - 10.7.1.8
+      - 10.7.1.9
+
+interfaces:
+  - name: eno17405np1
+    type: ethernet
+    state: up
+    mac-address: "5C:6F:69:99:3C:E0"
+    ipv4:
+      enabled: true
+      dhcp: false
+      address:
+        - ip: 10.7.51.80
+          prefix-length: 24
+    ipv6:
+      enabled: false
+
+routes:
+  config:
+    - destination: 0.0.0.0/0
+      next-hop-address: 10.7.51.1
+      next-hop-interface: eno17405np1
+
+
+---
+---
+interfaces:
+  - name: eno17405np1
+    type: ethernet
+    state: up
+    ipv4:
+      address:
+      - ip: 10.7.51.80
+        prefix-length: 24
+      dhcp: false
+      enabled: true
+    ipv6:
+      enabled: false
+routes:
+  config:
+  - next-hop-address: 192.0.2.1

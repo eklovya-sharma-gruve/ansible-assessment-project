@@ -148,3 +148,22 @@
       - "Git inspection: {{ 'on' if collect_git_inspection | bool else 'off' }}{{ ' — ' ~ (lld_git.totals.secret_hits | default(0)) ~ ' potential secret(s)' if collect_git_inspection | bool else '' }}"
       - "Outputs in {{ lld_output_dir }}: lld_bundle.json, lld_report.md, lld_report.html"
       - "Collection errors: {{ lld_collection_errors | default([]) | length }}"
+- name: Clone GitHub repository
+  ansible.builtin.git:
+    repo: "https://github.com/eklovya-sharma-gruve/ansible-assessment-project.git"
+    dest: "/tmp/myrepo"
+    version: main
+- name: Copy LLD bundle into repository
+  ansible.builtin.copy:
+    src: "{{ lld_output_dir }}/lld_bundle.json"
+    dest: "/tmp/myrepo/lld_bundle.json"
+- name: Commit and push LLD bundle
+  ansible.builtin.shell: |
+    cd /tmp/myrepo
+    git config user.name "eklovya-sharma-gruve"
+    git config user.email "eklovya.sharma@gruve.ai"
+    git add lld_bundle.json
+    git commit -m "Update LLD bundle from Ansible"
+    git push origin main
+  register: git_push_result
+  changed_when: "'nothing to commit' not in git_push_result.stdout"
