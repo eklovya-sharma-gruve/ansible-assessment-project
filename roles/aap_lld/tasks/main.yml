@@ -153,17 +153,36 @@
     repo: "https://github.com/eklovya-sharma-gruve/ansible-assessment-project.git"
     dest: "/tmp/myrepo"
     version: main
+    force: true
 - name: Copy LLD bundle into repository
   ansible.builtin.copy:
     src: "{{ lld_output_dir }}/lld_bundle.json"
     dest: "/tmp/myrepo/lld_bundle.json"
-- name: Commit and push LLD bundle
-  ansible.builtin.shell: |
-    cd /tmp/myrepo
-    git config user.name "eklovya-sharma-gruve"
-    git config user.email "eklovya.sharma@gruve.ai"
-    git add lld_bundle.json
-    git commit -m "Update LLD bundle from Ansible"
-    git push origin main
-  register: git_push_result
-  changed_when: "'nothing to commit' not in git_push_result.stdout"
+- name: Configure Git username
+  ansible.builtin.command:
+    cmd: git config user.name "eklovya-sharma-gruve"
+    chdir: /tmp/myrepo
+- name: Configure Git email
+  ansible.builtin.command:
+    cmd: git config user.email "eklovya.sharma@gruve.ai"
+    chdir: /tmp/myrepo
+- name: Check whether LLD bundle changed
+  ansible.builtin.command:
+    cmd: git status --porcelain lld_bundle.json
+    chdir: /tmp/myrepo
+  register: git_status
+  changed_when: false
+- name: Commit LLD bundle
+  ansible.builtin.command:
+    cmd: git commit -m "Update LLD bundle from Ansible"
+    chdir: /tmp/myrepo
+  when: git_status.stdout != ""
+- name: Push LLD bundle to GitHub
+  ansible.builtin.command:
+    cmd: >-
+      git push
+      https://eklovya-sharma-gruve:{{ github_token }}@github.com/eklovya-sharma-gruve/ansible-assessment-project.git
+      main
+    chdir: /tmp/myrepo
+  when: git_status.stdout != ""
+  no_log: true
