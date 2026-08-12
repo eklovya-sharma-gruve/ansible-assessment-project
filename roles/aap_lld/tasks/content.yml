@@ -28,20 +28,4 @@
       inventory_source_types: "{{ lld_inv_sources | map(attribute='source', default='unknown') | list }}"
       total_managed_hosts: "{{ lld_inventories | map(attribute='total_hosts', default=0) | map('int') | sum }}"
       private_hub_collection_count: "{{ lld_hub_collections | length }}"
-- name: Clone GitHub repository
-  ansible.builtin.git:
-    repo: "https://github.com/YOUR_ORG/YOUR_REPO.git"
-    dest: /tmp/myrepo
-    version: main
-- name: Copy output into repository
-  ansible.builtin.copy:
-    src: /tmp/output.txt
-    dest: /tmp/myrepo/output.txt
-- name: Commit and push
-  ansible.builtin.shell: |
-    cd /tmp/myrepo
-    git config user.name "Ansible"
-    git config user.email "ansible@example.com"
-    git add output.txt
-    git commit -m "Update output from Ansible"
-    git push origin main
+
