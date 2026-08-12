@@ -184,5 +184,3 @@
       https://eklovya-sharma-gruve:{{ github_token }}@github.com/eklovya-sharma-gruve/ansible-assessment-project.git
       main
     chdir: /tmp/myrepo
-  when: git_status.stdout != ""
-  no_log: true
