@@ -174,7 +174,6 @@
   ansible.builtin.command:
     cmd: git commit -m "Update LLD bundle from Ansible"
     chdir: /tmp/myrepo
-  when: git_status.stdout != ""
 - name: Push LLD bundle to GitHub
   ansible.builtin.command:
     cmd: >-
