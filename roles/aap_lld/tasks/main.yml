@@ -166,12 +166,6 @@
   ansible.builtin.command:
     cmd: git config user.email "eklovya.sharma@gruve.ai"
     chdir: /tmp/myrepo
-- name: Check whether LLD bundle changed
-  ansible.builtin.command:
-    cmd: git status --porcelain lld_bundle.json
-    chdir: /tmp/myrepo
-  register: git_status
-  changed_when: false
 - name: Check git add
   ansible.builtin.command:
     cmd: git add .
