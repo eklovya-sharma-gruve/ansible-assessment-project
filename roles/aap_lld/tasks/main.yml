@@ -181,3 +181,4 @@
       https://eklovya-sharma-gruve:{{ github_token }}@github.com/eklovya-sharma-gruve/ansible-assessment-project.git
       main
     chdir: /tmp/myrepo
+  no_log: true
