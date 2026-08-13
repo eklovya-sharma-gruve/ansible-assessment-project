@@ -39,9 +39,11 @@
   ansible.builtin.set_fact:
     lld_automation:
       job_template_count: "{{ lld_jts | length }}"
-      job_templates: "{{ lld_jts | map('gruve_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
-      system_job_templates: "{{ lld_sys_jts | map('gruve_sys_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
-      unified_job_templates: "{{ lld_unified_jts | map('gruve__unified_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
+      job_templates: "{{ lld_jts | map('gruve_pick', ['id','name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
+      system_job_template_count: "{{ lld_sys_jts | length }}"
+      system_job_templates: "{{ lld_sys_jts | map('gruve_sys_pick', ['id','name','description','job_type','enabled']) | list }}"
+      unified_job_template_count: "{{ lld_unified_jts | length }}"
+      unified_job_templates: "{{ lld_unified_jts | map('gruve__unified_pick', ['id','name','description','type','job_type','playbook','forks','verbosity','survey_enabled','ask_variables_on_launch','webhook_service','last_job','last_job_run']) | list }}"
       workflow_count: "{{ lld_wfjts | length }}"
       workflows: "{{ lld_wfjts | map('gruve_pick', ['name','survey_enabled']) | list }}"
       schedule_count: "{{ lld_schedules | length }}"
