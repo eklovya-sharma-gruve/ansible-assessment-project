@@ -5,6 +5,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 30,
                 "job_type": "run",
                 "name": "ansible-assessment-run",
                 "playbook": "playbooks/lld_extract.yml",
@@ -15,6 +16,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 10,
                 "job_type": "run",
                 "name": "check-disk-usage",
                 "playbook": "playbooks/check-disk.yml",
@@ -25,6 +27,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 11,
                 "job_type": "run",
                 "name": "check-essential-services",
                 "playbook": "playbooks/check-services.yml",
@@ -35,6 +38,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 7,
                 "job_type": "run",
                 "name": "Demo Job Template",
                 "playbook": "hello_world.yml",
@@ -45,6 +49,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 27,
                 "job_type": "run",
                 "name": "install-node-exporter",
                 "playbook": "playbooks/install-node-exporter.yml",
@@ -55,6 +60,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 19,
                 "job_type": "run",
                 "name": "meraki-device-down",
                 "playbook": "playbooks/meraki-device-down.yaml",
@@ -65,6 +71,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 20,
                 "job_type": "run",
                 "name": "miraki internet down",
                 "playbook": "playbooks/meraki-internet-down.yml",
@@ -75,6 +82,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 23,
                 "job_type": "run",
                 "name": "noc-resolve-incident",
                 "playbook": "playbooks/noc-resolve-incident.yml",
@@ -85,6 +93,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 9,
                 "job_type": "run",
                 "name": "Patch RHEL VMs",
                 "playbook": "playbooks/patch-rhel.yml",
@@ -95,6 +104,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 13,
                 "job_type": "run",
                 "name": "remediate-service",
                 "playbook": "playbooks/remediate-service.yml",
@@ -105,6 +115,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 12,
                 "job_type": "run",
                 "name": "restart service",
                 "playbook": "playbooks/restart-service.yml",
@@ -115,6 +126,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 28,
                 "job_type": "run",
                 "name": "satellite-vulnerability-sync",
                 "playbook": "playbooks/satellite-sync-vulnerabilities.yml",
@@ -125,6 +137,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 15,
                 "job_type": "run",
                 "name": "snow-add-notes",
                 "playbook": "playbooks/snow-add-notes.yml",
@@ -135,6 +148,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 14,
                 "job_type": "run",
                 "name": "snow-create-incident",
                 "playbook": "playbooks/snow-create-incident.yml",
@@ -145,6 +159,7 @@
             {
                 "ask_variables_on_launch": false,
                 "forks": 0,
+                "id": 16,
                 "job_type": "run",
                 "name": "snow-resolve-incident",
                 "playbook": "playbooks/snow-resolve-incident.yml",
@@ -155,6 +170,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 24,
                 "job_type": "run",
                 "name": "vm-service-restart",
                 "playbook": "playbooks/vm-service-restart.yml",
@@ -165,6 +181,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 26,
                 "job_type": "run",
                 "name": "vm-vulnerability-patch",
                 "playbook": "playbooks/vm-vulnerability-patch.yml",
@@ -175,6 +192,7 @@
             {
                 "ask_variables_on_launch": true,
                 "forks": 0,
+                "id": 25,
                 "job_type": "run",
                 "name": "vm-vulnerability-scan",
                 "playbook": "playbooks/vm-vulnerability-scan.yml",
@@ -185,12 +203,12 @@
         ],
         "notification_types": [],
         "recent_launch_types": {
-            "dependency": 47,
-            "manual": 82,
-            "relaunch": 8,
+            "dependency": 42,
+            "manual": 92,
+            "relaunch": 6,
             "scheduled": 35,
             "sync": 1,
-            "workflow": 27
+            "workflow": 24
         },
         "schedule_count": "5",
         "schedules": [
@@ -220,6 +238,445 @@
                 "rrule": "DTSTART;TZID=Asia/Kolkata:20260510T020000 RRULE:FREQ=WEEKLY;INTERVAL=1;WKST=SU"
             }
         ],
+        "system_job_template_count": "4",
+        "system_job_templates": [
+            {
+                "description": "Remove activity stream history",
+                "enabled": null,
+                "id": 2,
+                "job_type": "cleanup_activitystream",
+                "name": "Cleanup Activity Stream"
+            },
+            {
+                "description": "Cleanup expired OAuth 2 access and refresh tokens",
+                "enabled": null,
+                "id": 5,
+                "job_type": "cleanup_tokens",
+                "name": "Cleanup Expired OAuth 2 Tokens"
+            },
+            {
+                "description": "Cleans out expired browser sessions",
+                "enabled": null,
+                "id": 4,
+                "job_type": "cleanup_sessions",
+                "name": "Cleanup Expired Sessions"
+            },
+            {
+                "description": "Remove job history",
+                "enabled": null,
+                "id": 1,
+                "job_type": "cleanup_jobs",
+                "name": "Cleanup Job Details"
+            }
+        ],
+        "unified_job_template_count": "27",
+        "unified_job_templates": [
+            {
+                "ask_variables_on_launch": false,
+                "description": "",
+                "forks": 0,
+                "id": 30,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-08-13T11:14:08.892336Z",
+                "name": "ansible-assessment-run",
+                "playbook": "playbooks/lld_extract.yml",
+                "survey_enabled": true,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "",
+                "forks": null,
+                "id": 29,
+                "job_type": null,
+                "last_job": null,
+                "last_job_run": "2026-08-13T11:18:33.134771Z",
+                "name": "ansible-assessment-test",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "project",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "this projects has different playbooks that will help to automate our infrastructure .",
+                "forks": null,
+                "id": 8,
+                "job_type": null,
+                "last_job": null,
+                "last_job_run": "2026-08-08T20:30:02.855799Z",
+                "name": "automate-infra",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "project",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "checks the usage of disk",
+                "forks": 0,
+                "id": 10,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-06-22T12:54:00.651541Z",
+                "name": "check-disk-usage",
+                "playbook": "playbooks/check-disk.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this job template checks the essential services",
+                "forks": 0,
+                "id": 11,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-05-05T15:55:05.644093Z",
+                "name": "check-essential-services",
+                "playbook": "playbooks/check-services.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "Remove activity stream history",
+                "forks": null,
+                "id": 2,
+                "job_type": "cleanup_activitystream",
+                "last_job": null,
+                "last_job_run": "2026-08-11T16:48:03.093840Z",
+                "name": "Cleanup Activity Stream",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "system_job_template",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "Cleanup expired OAuth 2 access and refresh tokens",
+                "forks": null,
+                "id": 5,
+                "job_type": "cleanup_tokens",
+                "last_job": null,
+                "last_job_run": "2026-08-06T16:48:36.631570Z",
+                "name": "Cleanup Expired OAuth 2 Tokens",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "system_job_template",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "Cleans out expired browser sessions",
+                "forks": null,
+                "id": 4,
+                "job_type": "cleanup_sessions",
+                "last_job": null,
+                "last_job_run": "2026-08-06T16:48:32.788599Z",
+                "name": "Cleanup Expired Sessions",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "system_job_template",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "Remove job history",
+                "forks": null,
+                "id": 1,
+                "job_type": "cleanup_jobs",
+                "last_job": null,
+                "last_job_run": "2026-08-09T16:48:03.462142Z",
+                "name": "Cleanup Job Details",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "system_job_template",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "",
+                "forks": 0,
+                "id": 7,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": null,
+                "name": "Demo Job Template",
+                "playbook": "hello_world.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": null,
+                "description": "",
+                "forks": null,
+                "id": 6,
+                "job_type": null,
+                "last_job": null,
+                "last_job_run": "2026-05-08T06:06:25.719434Z",
+                "name": "Demo Project",
+                "playbook": null,
+                "survey_enabled": null,
+                "type": "project",
+                "verbosity": null,
+                "webhook_service": null
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "this workflow remediates HA proxy not running",
+                "forks": null,
+                "id": 17,
+                "job_type": null,
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:58:22.019905Z",
+                "name": "HAProxy not working Remediation Workflow",
+                "playbook": null,
+                "survey_enabled": true,
+                "type": "workflow_job_template",
+                "verbosity": null,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "",
+                "forks": 0,
+                "id": 27,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-05-10T08:18:46.737237Z",
+                "name": "install-node-exporter",
+                "playbook": "playbooks/install-node-exporter.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 19,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-06-03T15:38:51.939659Z",
+                "name": "meraki-device-down",
+                "playbook": "playbooks/meraki-device-down.yaml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": null,
+                "id": 21,
+                "job_type": null,
+                "last_job": null,
+                "last_job_run": "2026-06-18T14:14:29.445193Z",
+                "name": "meraki-remediation-workflow",
+                "playbook": null,
+                "survey_enabled": false,
+                "type": "workflow_job_template",
+                "verbosity": null,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 20,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-04-28T09:34:12.638655Z",
+                "name": "miraki internet down",
+                "playbook": "playbooks/meraki-internet-down.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 23,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:58:21.892525Z",
+                "name": "noc-resolve-incident",
+                "playbook": "playbooks/noc-resolve-incident.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "",
+                "forks": 0,
+                "id": 9,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-05-07T14:24:30.687059Z",
+                "name": "Patch RHEL VMs",
+                "playbook": "playbooks/patch-rhel.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this template helps to restart stopped service",
+                "forks": 0,
+                "id": 13,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-05-07T11:29:16.984638Z",
+                "name": "remediate-service",
+                "playbook": "playbooks/remediate-service.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this template asks for a service and restarts it for you",
+                "forks": 0,
+                "id": 12,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-04-18T06:24:47.608395Z",
+                "name": "restart service",
+                "playbook": "playbooks/restart-service.yml",
+                "survey_enabled": true,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 28,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-06-27T11:27:29.136081Z",
+                "name": "satellite-vulnerability-sync",
+                "playbook": "playbooks/satellite-sync-vulnerabilities.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 1,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this template automatically allows us to add notes",
+                "forks": 0,
+                "id": 15,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:58:11.061077Z",
+                "name": "snow-add-notes",
+                "playbook": "playbooks/snow-add-notes.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this template creates incident on logs capture",
+                "forks": 0,
+                "id": 14,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:57:13.224090Z",
+                "name": "snow-create-incident",
+                "playbook": "playbooks/snow-create-incident.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": false,
+                "description": "this template resolves incidents",
+                "forks": 0,
+                "id": 16,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:58:16.452942Z",
+                "name": "snow-resolve-incident",
+                "playbook": "playbooks/snow-resolve-incident.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 24,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-07-15T09:58:05.624051Z",
+                "name": "vm-service-restart",
+                "playbook": "playbooks/vm-service-restart.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 26,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-06-27T11:31:14.107237Z",
+                "name": "vm-vulnerability-patch",
+                "playbook": "playbooks/vm-vulnerability-patch.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            },
+            {
+                "ask_variables_on_launch": true,
+                "description": "",
+                "forks": 0,
+                "id": 25,
+                "job_type": "run",
+                "last_job": null,
+                "last_job_run": "2026-08-08T20:30:36.447630Z",
+                "name": "vm-vulnerability-scan",
+                "playbook": "playbooks/vm-vulnerability-scan.yml",
+                "survey_enabled": false,
+                "type": "job_template",
+                "verbosity": 0,
+                "webhook_service": ""
+            }
+        ],
         "webhook_enabled_templates": "0",
         "workflow_count": "2",
         "workflows": [
@@ -234,6 +691,7 @@
         ]
     },
     "content": {
+        "constructed_inventory_count": "0",
         "git_project_count": "3",
         "inventories": [
             {
@@ -340,6 +798,65 @@
         ],
         "ha": false,
         "has_mesh": false,
+        "host_count": "7",
+        "hosts": [
+            {
+                "description": "",
+                "enabled": true,
+                "id": 20,
+                "instance_id": "",
+                "inventory": 2,
+                "name": "EDNJ-CORE1-R6.40"
+            },
+            {
+                "description": "",
+                "enabled": true,
+                "id": 10,
+                "instance_id": "",
+                "inventory": 2,
+                "name": "gruve-noc-test-vm-1"
+            },
+            {
+                "description": "",
+                "enabled": true,
+                "id": 19,
+                "instance_id": "",
+                "inventory": 2,
+                "name": "gruve-noc-test-vm-2"
+            },
+            {
+                "description": "",
+                "enabled": true,
+                "id": 15,
+                "instance_id": "",
+                "inventory": 2,
+                "name": "gruve-noc-test-vm-3"
+            },
+            {
+                "description": "HAProxy VM - NJ DC",
+                "enabled": true,
+                "id": 2,
+                "instance_id": "",
+                "inventory": 2,
+                "name": "haproxy.ocp-mig2.gruveai.com"
+            },
+            {
+                "description": "",
+                "enabled": true,
+                "id": 1,
+                "instance_id": "",
+                "inventory": 1,
+                "name": "localhost"
+            },
+            {
+                "description": "",
+                "enabled": true,
+                "id": 21,
+                "instance_id": "",
+                "inventory": 3,
+                "name": "localhost"
+            }
+        ],
         "instance_count": "1",
         "instance_groups": [
             {
@@ -377,30 +894,30 @@
         "version": "4.7.15"
     },
     "job_analytics": {
-        "avg_elapsed_seconds": "110.4",
-        "failed_count": "53",
+        "avg_elapsed_seconds": "110.6",
+        "failed_count": "57",
         "failing_templates": {
-            "ansible-assessment-run": 27,
+            "ansible-assessment-run": 31,
             "satellite-vulnerability-sync": 19,
             "snow-create-incident": 3,
             "snow-resolve-incident": 1,
             "vm-vulnerability-patch": 1,
             "vm-vulnerability-scan": 2
         },
-        "failure_rate_pct": "26",
+        "failure_rate_pct": "28",
         "jobs_analysed": "200",
         "max_elapsed_seconds": "17948.886",
         "status_breakdown": {
             "canceled": 4,
-            "failed": 53,
+            "failed": 57,
             "pending": 1,
             "running": 1,
-            "successful": 141
+            "successful": 137
         },
-        "success_count": "141",
-        "success_rate_pct": "70",
+        "success_count": "137",
+        "success_rate_pct": "68",
         "top_templates_by_runs": {
-            "ansible-assessment-run": 42,
+            "ansible-assessment-run": 47,
             "check-disk-usage": 4,
             "meraki-device-down": 1,
             "noc-resolve-incident": 12,
@@ -410,7 +927,7 @@
             "snow-resolve-incident": 14,
             "vm-service-restart": 13,
             "vm-vulnerability-patch": 20,
-            "vm-vulnerability-scan": 25
+            "vm-vulnerability-scan": 20
         }
     },
     "licensing": {
@@ -428,7 +945,7 @@
         "aap_api_flavour": "gateway",
         "collection_errors": [],
         "customer": "[CUSTOMER NAME]",
-        "generated_utc": "2026-08-13T09:47:39Z",
+        "generated_utc": "2026-08-13T11:19:51Z",
         "git_inspection_enabled": false,
         "source_host": "https://aap-aap.apps.ocp-mig2.gruveai.com",
         "survey_source": "defaults"
@@ -436,6 +953,8 @@
     "rbac": {
         "auditor_count": "1",
         "credential_count": "6",
+        "credential_input_source_count": "0",
+        "credential_input_sources": [],
         "credential_type_summary": [
             {
                 "credential_type": {
