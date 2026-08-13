@@ -4,6 +4,14 @@
   ansible.builtin.include_tasks: _fetch.yml
   vars: { fetch_url: "{{ aap_prefix.controller }}/job_templates/", fetch_fact: lld_jts }
 
+- name: Collect system templates
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/system_job_templates", fetch_fact: lld_sys_jts }
+
+- name: Collect unified templates
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/unified_job_templates", fetch_fact: lld_unified_jts }
+
 - name: Collect workflow job templates
   ansible.builtin.include_tasks: _fetch.yml
   vars: { fetch_url: "{{ aap_prefix.controller }}/workflow_job_templates/", fetch_fact: lld_wfjts }
@@ -32,6 +40,8 @@
     lld_automation:
       job_template_count: "{{ lld_jts | length }}"
       job_templates: "{{ lld_jts | map('gruve_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
+      system_job_templates: "{{ lld_sys_jts | map('gruve_sys_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
+      unified_job_templates: "{{ lld_unified_jts | map('gruve__unified_pick', ['name','job_type','playbook','forks','verbosity','webhook_service','survey_enabled','ask_variables_on_launch']) | list }}"
       workflow_count: "{{ lld_wfjts | length }}"
       workflows: "{{ lld_wfjts | map('gruve_pick', ['name','survey_enabled']) | list }}"
       schedule_count: "{{ lld_schedules | length }}"

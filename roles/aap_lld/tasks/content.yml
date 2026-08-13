@@ -8,6 +8,10 @@
   ansible.builtin.include_tasks: _fetch.yml
   vars: { fetch_url: "{{ aap_prefix.controller }}/inventories/", fetch_fact: lld_inventories }
 
+- name: Collect constructed inventories
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/constructed_inventories/", fetch_fact: lld_constructed_inventories }
+
 - name: Collect inventory sources
   ansible.builtin.include_tasks: _fetch.yml
   vars: { fetch_url: "{{ aap_prefix.controller }}/inventory_sources/", fetch_fact: lld_inv_sources }
@@ -24,6 +28,7 @@
       git_project_count: "{{ lld_projects | selectattr('scm_type','defined') | selectattr('scm_type','equalto','git') | list | length }}"
       manual_project_count: "{{ lld_projects | selectattr('scm_type','defined') | selectattr('scm_type','equalto','') | list | length }}"
       inventory_count: "{{ lld_inventories | length }}"
+      constructed_inventory_count: "{{ lld_constructed_inventories | length }}"
       inventories: "{{ lld_inventories | map('gruve_pick', ['name','kind','total_hosts','total_groups','has_inventory_sources']) | list }}"
       inventory_source_types: "{{ lld_inv_sources | map(attribute='source', default='unknown') | list }}"
       total_managed_hosts: "{{ lld_inventories | map(attribute='total_hosts', default=0) | map('int') | sum }}"

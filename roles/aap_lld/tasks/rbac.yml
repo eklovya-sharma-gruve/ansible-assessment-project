@@ -20,6 +20,10 @@
   ansible.builtin.include_tasks: _fetch.yml
   vars: { fetch_url: "{{ aap_prefix.controller }}/credentials/", fetch_fact: lld_credentials }
 
+- name: Collect credentials input sources
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: { fetch_url: "{{ aap_prefix.controller }}/credential_input_sources/", fetch_fact: lld_credentials_input_sources }
+
 - name: Distil RBAC LLD
   ansible.builtin.set_fact:
     lld_rbac:
@@ -33,3 +37,5 @@
       credential_count: "{{ lld_credentials | length }}"
       external_secret_backends: "{{ lld_cred_types | selectattr('kind','defined') | selectattr('kind','equalto','external') | map(attribute='name') | list }}"
       credential_type_summary: "{{ lld_credentials | map(attribute='summary_fields', default={}) | map('gruve_pick', ['credential_type']) | list }}"
+      credential_input_source_count: "{{ lld_credentials_input_sources | length }}"
+      credential_input_sources: "{{ lld_credentials_input_sources | map('gruve_pick', ['id','source_credential','target_credential','input_field_name','metadata']) | list }}"

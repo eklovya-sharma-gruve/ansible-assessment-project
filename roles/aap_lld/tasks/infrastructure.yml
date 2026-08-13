@@ -26,6 +26,18 @@
     fetch_url: "{{ aap_prefix.controller }}/instances/"
     fetch_fact: lld_instances
 
+- name: Collect hosts"
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: 
+    fetch_url: "{{ aap_prefix.controller }}/hosts/"
+    fetch_fact: lld_hosts
+
+- name: Collect hosts metrics"
+  ansible.builtin.include_tasks: _fetch.yml
+  vars: 
+    fetch_url: "{{ aap_prefix.controller }}/host_metrics/"
+    fetch_fact: lld_host_metrics
+
 - name: Collect instance groups
   ansible.builtin.include_tasks: _fetch.yml
   vars:
@@ -46,6 +58,8 @@
       instance_count: "{{ lld_instances | length }}"
       instances: "{{ lld_instances | map('gruve_pick', ['hostname','node_type','node_state','enabled','capacity','cpu','memory','ip_address']) | list }}"
       node_types: "{{ lld_instances | map(attribute='node_type', default='unknown') | list }}"
+      host_count: "{{ lld_hosts | length }}"
+      hosts: "{{ lld_hosts | map('gruve_pick', ['id','name','description','inventory','enabled','instance_id']) | list }}"
       instance_groups: "{{ lld_instance_groups | map('gruve_pick', ['name','is_container_group','policy_instance_minimum','policy_instance_percentage','max_concurrent_jobs','max_forks']) | list }}"
       execution_environments: "{{ lld_execution_environments | map('gruve_pick', ['name','image','pull']) | list }}"
       has_mesh: "{{ (lld_instances | selectattr('node_type','defined') | selectattr('node_type','in',['execution','hop']) | list | length) > 0 }}"
