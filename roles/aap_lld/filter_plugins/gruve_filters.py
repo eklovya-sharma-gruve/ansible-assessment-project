@@ -8,7 +8,6 @@ def gruve_pick(item, keys):
         return {}
     return {k: item.get(k) for k in keys}
 
-
 def gruve_counter(seq):
     """Count occurrences in a list -> dict(value: count). Replaces community.general.counter."""
     out = {}
