@@ -6,11 +6,11 @@
 
 - name: Collect system templates
   ansible.builtin.include_tasks: _fetch.yml
-  vars: { fetch_url: "{{ aap_prefix.controller }}/system_job_templates", fetch_fact: lld_sys_jts }
+  vars: { fetch_url: "{{ aap_prefix.controller }}/system_job_templates/", fetch_fact: lld_sys_jts }
 
 - name: Collect unified templates
   ansible.builtin.include_tasks: _fetch.yml
-  vars: { fetch_url: "{{ aap_prefix.controller }}/unified_job_templates", fetch_fact: lld_unified_jts }
+  vars: { fetch_url: "{{ aap_prefix.controller }}/unified_job_templates/", fetch_fact: lld_unified_jts }
 
 - name: Collect workflow job templates
   ansible.builtin.include_tasks: _fetch.yml
